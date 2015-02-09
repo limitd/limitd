@@ -1,0 +1,7 @@
+port: 9001
+
+buckets:
+  ip:
+    size:         10
+    per_interval: 1
+    interval:     1000

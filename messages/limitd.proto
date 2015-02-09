@@ -1,0 +1,18 @@
+package limitd;
+
+message Request {
+  required string id = 1;
+  required string class = 2;
+  required string key = 3;
+  optional int32 count = 4 [default = 1];
+}
+
+message Response {
+  required string request_id = 1;
+  required bool conformant = 2;
+  enum ErrorType {
+    NO_ERROR = 0;
+    UNKNOWN_BUCKET_CLASS = 1;
+  }
+  optional ErrorType error = 3 [default = NO_ERROR];
+}
