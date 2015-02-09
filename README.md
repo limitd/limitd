@@ -8,7 +8,7 @@ While there are many solutions that relies on a central database like redis, the
 
 The core concepts of limitd are:
 
--  [Token Bucket](http://en.wikipedia.org/wiki/Token_bucket): is the main algorithm used in limitd.
+-  [Token Bucket](http://en.wikipedia.org/wiki/Token_bucket): is the main algorithm used by limitd.
 -  **Bucket Class**: defines the behavior of a bucket instance. Classes are defined in the configuration of the server. Eg: **ApiCall** 150 per hour.
 -  **Bucket Instance**: is the incarnation of a bucket. Eg: **Customer 123 Api Call**. Bucket instances are:
     -  Created on demand.
@@ -94,7 +94,7 @@ app.use(function (req, res, next) {
 })
 ```
 
-## CTL (not done yet)
+## cli tool (not done yet)
 
 limitdctl comes with limitd:
 
