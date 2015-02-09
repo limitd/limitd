@@ -16,7 +16,7 @@ The core concepts of limitd are:
 -  **Request**: a request made by a client to take **N tokens** from the **bucket instance X** of the **bucket class y**.
 -  **Response**: is the response from the server to a client request indicating that the operation was succesful or not.
 
-Limitd doesn't take care of throttling the application is in charge of handling non-conformant traffic.
+Limitd doesn't take care of throttling, the application is in charge of handling non-conformant traffic.
 
 Limitd uses protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [/blob/master/messages/limitd.proto].
 
