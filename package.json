@@ -4,7 +4,7 @@
   "description": "Daemon for rate limiting using tocket buckets.",
   "main": "client.js",
   "scripts": {
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha --timeout 5000"
   },
   "bin": {
     "limitd": "./server",

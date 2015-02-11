@@ -26,7 +26,7 @@ function LimitdClient (options) {
 util.inherits(LimitdClient, EventEmitter);
 
 
-LimitdClient.prototype.request = function (clazz, key, count, done) {
+LimitdClient.prototype._request = function (method, clazz, key, count, done) {
   if (typeof count === 'function') {
     done = count;
     count = 1;
@@ -38,6 +38,7 @@ LimitdClient.prototype.request = function (clazz, key, count, done) {
     'id':     randomstring.generate(7),
     'class':  clazz,
     'key':    key,
+    'method': RequestMessage.Method[method],
     'count':  count
   });
 
@@ -48,6 +49,18 @@ LimitdClient.prototype.request = function (clazz, key, count, done) {
     }
     done(null, response);
   });
+};
+
+LimitdClient.prototype.take = function (clazz, key, count, done) {
+  return this._request('TAKE', clazz, key, count, done);
+};
+
+LimitdClient.prototype.put = function (clazz, key, count, done) {
+  return this._request('PUT', clazz, key, count, done);
+};
+
+LimitdClient.prototype.wait = function (clazz, key, count, done) {
+  return this._request('WAIT', clazz, key, count, done);
 };
 
 module.exports = LimitdClient;

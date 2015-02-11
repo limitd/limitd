@@ -4,7 +4,16 @@ message Request {
   required string id = 1;
   required string class = 2;
   required string key = 3;
-  optional int32 count = 4 [default = 1];
+
+  enum Method {
+    TAKE = 0;
+    WAIT = 1;
+    PUT = 2;
+  }
+
+  required Method method = 4;
+
+  optional int32 count = 5 [default = 1];
 }
 
 message Response {

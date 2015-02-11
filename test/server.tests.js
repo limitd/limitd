@@ -29,7 +29,7 @@ describe('limitd server', function () {
   });
 
   it('should work with a simple request', function (done) {
-    client.request('ip', '211.123.12.12', function (err, response) {
+    client.take('ip', '211.123.12.12', function (err, response) {
       if (err) return done(err);
       assert.ok(response.conformant);
       done();
@@ -37,21 +37,33 @@ describe('limitd server', function () {
   });
 
   it('should fail when the bucket class doesnt exist', function (done) {
-    client.request('blabla', '211.123.12.12', function (err) {
+    client.take('blabla', '211.123.12.12', function (err) {
       assert.equal(err.message, 'blabla is not a valid bucket class');
       done();
     });
   });
 
   it('should return false when traffic is not conformant', function (done) {
-    async.each(_.range(0, 10), function (i, done) {
-      client.request('ip', '211.123.12.24', done);
+    async.each(_.range(0, 10), function (i, cb) {
+      client.take('ip', '211.123.12.24', cb);
     }, function (err) {
       if (err) return done(err);
-      client.request('ip', '211.123.12.24', function (err, response) {
+      client.take('ip', '211.123.12.24', function (err, response) {
         assert.notOk(response.conformant);
         done();
       });
+    });
+  });
+
+  it('should autoremove unused buckets', function (done) {
+    client.take('ip', '211.45.66.1', function (err) {
+      if (err) return done(err);
+      setTimeout(function () {
+        LimitdServer._db.get('ÿipÿ211.45.66.1', function (err, result) {
+          assert.isUndefined(result);
+          done();
+        });
+      }, 1700);
     });
   });
 
