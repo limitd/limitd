@@ -2,6 +2,7 @@ var LimitdServer = require('../server');
 var LimitdClient = require('../client');
 
 var assert = require('chai').assert;
+var expect = require('chai').expect;
 var rimraf = require('rimraf');
 var client;
 
@@ -13,7 +14,7 @@ describe('limitd server', function () {
     var db_file = __dirname + '/dbs/server.tests.db';
 
     try{
-      rimraf.sync();
+      rimraf.sync(db_file);
     } catch(err){}
 
     LimitdServer.start({config_file: __dirname + '/fixture.yml', db: db_file}, function (err, address) {
@@ -28,11 +29,66 @@ describe('limitd server', function () {
 
   });
 
-  it('should work with a simple request', function (done) {
-    client.take('ip', '211.123.12.12', function (err, response) {
-      if (err) return done(err);
-      assert.ok(response.conformant);
-      done();
+  describe('TAKE', function () {
+    it('should work with a simple request', function (done) {
+      client.take('ip', '211.123.12.12', function (err, response) {
+        if (err) return done(err);
+        assert.ok(response.conformant);
+        done();
+      });
+    });
+
+    it('should work with a fixed bucket', function (done) {
+      async.map(_.range(0, 3), function (i, cb) {
+        client.take('wrong_password', 'tito', cb);
+      }, function (err, results) {
+        if (err) return done(err);
+        assert.ok(results.every(function (r) {
+          return r.conformant;
+        }));
+        client.take('wrong_password', 'tito', function (err, response) {
+          assert.notOk(response.conformant);
+          done();
+        });
+      });
+    });
+
+    it('should return false when traffic is not conformant', function (done) {
+      async.each(_.range(0, 10), function (i, cb) {
+        client.take('ip', '211.123.12.24', cb);
+      }, function (err) {
+        if (err) return done(err);
+        client.take('ip', '211.123.12.24', function (err, response) {
+          assert.notOk(response.conformant);
+          done();
+        });
+      });
+    });
+  });
+
+
+  describe('WAIT', function () {
+    it('should work with a simple request', function (done) {
+      client.wait('ip', '211.76.23.4', function (err, response) {
+        if (err) return done(err);
+        assert.ok(response.conformant);
+        done();
+      });
+    });
+
+
+    it('should return false when traffic is not conformant', function (done) {
+      async.each(_.range(0, 10), function (i, cb) {
+        client.wait('ip', '211.76.23.5', cb);
+      }, function (err) {
+        if (err) return done(err);
+        var waitingSince = Date.now();
+        client.wait('ip', '211.76.23.5', 3, function (err, response) {
+          assert.ok(response.conformant);
+          expect(Date.now() - waitingSince).to.be.within(580, 620);
+          done();
+        });
+      });
     });
   });
 
@@ -40,18 +96,6 @@ describe('limitd server', function () {
     client.take('blabla', '211.123.12.12', function (err) {
       assert.equal(err.message, 'blabla is not a valid bucket class');
       done();
-    });
-  });
-
-  it('should return false when traffic is not conformant', function (done) {
-    async.each(_.range(0, 10), function (i, cb) {
-      client.take('ip', '211.123.12.24', cb);
-    }, function (err) {
-      if (err) return done(err);
-      client.take('ip', '211.123.12.24', function (err, response) {
-        assert.notOk(response.conformant);
-        done();
-      });
     });
   });
 
@@ -63,7 +107,7 @@ describe('limitd server', function () {
           assert.isUndefined(result);
           done();
         });
-      }, 1700);
+      }, 2200);
     });
   });
 
