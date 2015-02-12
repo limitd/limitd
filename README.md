@@ -22,9 +22,9 @@ Limitd uses protocol uses [Protocol Buffers](https://developers.google.com/proto
 
 ## Server operations
 
--  TAKE: remove one or more tokens from the bucket. The server will respond inmediately with `conformant` true/false depending if there are sufficient tokens.
--  WAIT: remove one or more tokens from the bucket. If there are insufficient tokens in the bucket the server will not respond the request until there are enought tokens.
--  PUT: fill the bucket with one or more tokens. The max amount of tokens depends on the size of the bucket. This is useful in cases that the application have a wait to reset the limit.
+-  **TAKE**: remove one or more tokens from the bucket. The server will respond inmediately with `conformant` true/false depending if there are sufficient tokens.
+-  **WAIT**: remove one or more tokens from the bucket. If there are insufficient tokens in the bucket the server will not respond the request until there are enought tokens.
+-  **PUT**: fill the bucket with one or more tokens. The max amount of tokens depends on the size of the bucket. This is useful in cases that the application need to reset a bucket that's not autofilled by limitd.
 
 ## About this module
 
