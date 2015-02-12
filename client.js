@@ -17,7 +17,7 @@ function LimitdClient (options) {
 
   this.socket.once('connect', function () {
     client.emit('connect');
-  }).pipe(ResponseDecoder).on('data', function (response) {
+  }).pipe(ResponseDecoder()).on('data', function (response) {
     client.emit('response', response);
     client.emit('response_' + response.request_id, response);
   });

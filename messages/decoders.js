@@ -16,7 +16,7 @@ function buildDecoder(Message) {
       try {
         decoded = Message.decodeDelimited(buffer);
       } catch (err) {
-        return this.queue({ error: 'unknown message' });
+        this.emit('error', err);
       }
 
       if (!decoded) break;
@@ -28,5 +28,7 @@ function buildDecoder(Message) {
 }
 
 Object.keys(messages).forEach(function (k) {
-  module.exports[k + 'Decoder'] = buildDecoder(messages[k]);
+  module.exports[k + 'Decoder'] = function () {
+    return buildDecoder(messages[k]);
+  };
 });

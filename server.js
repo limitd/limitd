@@ -7,32 +7,30 @@ var Buckets = require('./lib/buckets');
 var log = require('./lib/log');
 
 var RequestDecoder = require('./messages/decoders').RequestDecoder;
-var ResponseMessage = require('./messages').Response;
 var server_config = require('./lib/server_config');
 var db = require('./lib/db');
 
+var ClassValidator = require('./lib/pipeline/class_validator');
+var TokenExtractor = require('./lib/pipeline/token_extractor');
+var ResponseWriter = require('./lib/pipeline/response_writer');
+
 function connection_handler (socket) {
-  log.debug(_.pick(socket, ['remoteAddress', 'remotePort']), 'connection accepted');
-  socket.pipe(RequestDecoder).on('data', function (m) {
-    if (m.error) {
-      log.debug(_.pick(socket, ['remoteAddress', 'remotePort']), 'unknown message format');
-      return socket.end();
-    }
-    var bucket_class = server._buckets.get(m['class']);
-    if (!bucket_class) {
-      return socket.write(new ResponseMessage({
-        request_id: m.id,
-        conformant: false,
-        error: ResponseMessage.ErrorType.UNKNOWN_BUCKET_CLASS
-      }).encodeDelimited().toBuffer());
-    }
-    bucket_class.removeToken(m.key, m.count, function (err, result) {
-      socket.write(new ResponseMessage({
-        request_id: m.id,
-        conformant: !err && result,
-      }).encodeDelimited().toBuffer());
-    });
+  var sockets_details = _.pick(socket, ['remoteAddress', 'remotePort']);
+
+  log.debug(sockets_details, 'connection accepted');
+
+  var decoder = RequestDecoder();
+
+  decoder.on('error', function () {
+    log.debug(sockets_details, 'unknown message format');
+    return socket.end();
   });
+
+  socket.pipe(decoder)
+        .pipe(ClassValidator(server._buckets))
+        .pipe(TokenExtractor(server._buckets))
+        .pipe(ResponseWriter())
+        .pipe(socket);
 }
 
 server.start = function (options, callback) {
