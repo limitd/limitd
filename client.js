@@ -1,15 +1,19 @@
-var EventEmitter    = require('events').EventEmitter;
-var util            = require('util');
-var randomstring    = require('randomstring');
-var reconnect = require('reconnect-net');
-var Socket = require('net').Socket;
-var RequestMessage  = require('./messages').Request;
+var EventEmitter     = require('events').EventEmitter;
+var util             = require('util');
+var randomstring     = require('randomstring');
+var reconnect        = require('reconnect-net');
+var RequestMessage   = require('./messages').Request;
 var ResponseMessage  = require('./messages').Response;
-var ResponseDecoder = require('./messages/decoders').ResponseDecoder;
-
+var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
+var url              = require('url');
+var _                = require('lodash');
 
 function LimitdClient (options) {
   EventEmitter.call(this);
+  if (typeof options === 'string') {
+    options = _.pick(url.parse(options), ['port', 'hostname']);
+    options.port = parseInt(options.port || 9231, 10);
+  }
   this._options = options;
   this.connect();
 }
@@ -38,7 +42,7 @@ LimitdClient.prototype.connect = function (done) {
     client.emit('close', has_error);
   }).on('error', function (err) {
     client.emit('error', err);
-  }).connect(options.port, options.address || options.host);
+  }).connect(options.port, options.address || options.hostname || options.host);
 };
 
 LimitdClient.prototype._request = function (method, clazz, key, count, done) {
