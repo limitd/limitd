@@ -20,28 +20,16 @@ LimitdClient.prototype.connect = function (done) {
   var options = this._options;
   var client = this;
 
-  // this.socket = reconnect(function (stream) {
-  //   this.socket.once('connect', function () {
-  // //   client.socket.setKeepAlive(true);
-  // //   client.emit('connect');
-  // //   if (done) {
-  // //     done();
-  // //   }
-  // // }).on('close', function (has_error) {
-  // //   client.emit('close', has_error);
-  // // }).on('error', function (err) {
-  // //   client.emit('error', err);
-  // // }).pipe(ResponseDecoder()).on('data', function (response) {
-  // //   client.emit('response', response);
-  // //   client.emit('response_' + response.request_id, response);
-  // // });
-  // }).connect(options.port, options.address || options.host);
+  this.socket = reconnect(function (stream) {
 
-  this.socket = new Socket();
-  this.socket.connect(options.port, options.address || options.host);
+    stream.pipe(ResponseDecoder()).on('data', function (response) {
+      client.emit('response', response);
+      client.emit('response_' + response.request_id, response);
+    });
 
-  this.socket.once('connect', function () {
-    client.socket.setKeepAlive(true);
+    client.stream = stream;
+
+  }).once('connect', function () {
     client.emit('connect');
     if (done) {
       done();
@@ -50,10 +38,7 @@ LimitdClient.prototype.connect = function (done) {
     client.emit('close', has_error);
   }).on('error', function (err) {
     client.emit('error', err);
-  }).pipe(ResponseDecoder()).on('data', function (response) {
-    client.emit('response', response);
-    client.emit('response_' + response.request_id, response);
-  });
+  }).connect(options.port, options.address || options.host);
 };
 
 LimitdClient.prototype._request = function (method, clazz, key, count, done) {
@@ -72,13 +57,13 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
     'count':  count
   });
 
-  if (!this.socket.writable) {
+  if (!this.stream.writable) {
     return process.nextTick(function () {
       done(new Error('The socket is closed.'));
     });
   }
 
-  this.socket.write(request.encodeDelimited().toBuffer());
+  this.stream.write(request.encodeDelimited().toBuffer());
   this.once('response_' + request.id, function (response) {
     if (response.error === ResponseMessage.ErrorType.UNKNOWN_BUCKET_CLASS) {
       return done(new Error(clazz + ' is not a valid bucket class'));
