@@ -19,9 +19,13 @@ message Request {
 message Response {
   required string request_id = 1;
   required bool conformant = 2;
+
+  optional bool delayed = 3 [default = false];
+
   enum ErrorType {
     NO_ERROR = 0;
     UNKNOWN_BUCKET_CLASS = 1;
   }
-  optional ErrorType error = 3 [default = NO_ERROR];
+
+  optional ErrorType error = 4 [default = NO_ERROR];
 }

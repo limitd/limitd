@@ -75,6 +75,8 @@ describe('limitd server', function () {
       client.wait('ip', '211.76.23.4', function (err, response) {
         if (err) return done(err);
         assert.ok(response.conformant);
+        assert.notOk(response.delayed);
+
         done();
       });
     });
@@ -88,6 +90,7 @@ describe('limitd server', function () {
         var waitingSince = Date.now();
         client.wait('ip', '211.76.23.5', 3, function (err, response) {
           assert.ok(response.conformant);
+          assert.ok(response.delayed);
           expect(Date.now() - waitingSince).to.be.within(580, 620);
           done();
         });

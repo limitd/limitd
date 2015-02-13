@@ -29,6 +29,16 @@ app.get('/', function (req, res, next) {
   res.send('hello world!');
 });
 
+app.get('/throttled', function (req, res, next) {
+  limitdClient.wait('ip', req.ip, 1, function (err, respose) {
+    if (err) return next(err);
+    req.delayed = respose.delayed;
+    next();
+  });
+}, function (req, res) {
+  res.send('hello world! Delayed: ' + req.delayed);
+});
+
 
 http.createServer(app).listen(9000, function (err) {
   console.log('listening on http://localhost:9000');

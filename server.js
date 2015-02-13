@@ -9,8 +9,9 @@ var Buckets = require('./lib/buckets');
 var RequestDecoder = require('./messages/decoders').RequestDecoder;
 
 var ClassValidator = require('./lib/pipeline/class_validator');
-var TokenExtractor = require('./lib/pipeline/token_extractor');
 var ResponseWriter = require('./lib/pipeline/response_writer');
+var RemoveToken = require('./lib/pipeline/remove_token');
+var WaitToken = require('./lib/pipeline/wait_token');
 
 var db = require('./lib/db');
 
@@ -70,7 +71,8 @@ LimitdServer.prototype._handler = function (socket) {
 
   socket.pipe(decoder)
         .pipe(ClassValidator(this._buckets))
-        .pipe(TokenExtractor(this._buckets))
+        .pipe(RemoveToken(this._buckets, log))
+        .pipe(WaitToken(this._buckets, log))
         .pipe(ResponseWriter())
         .pipe(socket);
 };
