@@ -2,17 +2,20 @@ var LimitdServer = require('../server');
 
 var Socket = require('net').Socket;
 var rimraf = require('rimraf');
+var _ = require('lodash');
 
-describe('limitd server - wrong request', function () {
+describe('wrong requests', function () {
+  var server, address;
+
   before(function (done) {
     var db_file = __dirname + '/dbs/unexpected_conditions.db';
     try{
       rimraf.sync(db_file);
     } catch(err){}
-    LimitdServer.start({
-      config_file: __dirname + '/fixture.yml',
-      db: db_file
-    }, function (err, addr) {
+
+    server = new LimitdServer(_.extend({db: db_file}, require('./fixture')));
+
+    server.start(function (err, addr) {
       if (err) return done(err);
       address = addr;
       done();
@@ -20,7 +23,7 @@ describe('limitd server - wrong request', function () {
   });
 
   after(function () {
-    LimitdServer.stop();
+    server.close();
   });
 
   it('should disconnect the socket on unknown message', function (done) {

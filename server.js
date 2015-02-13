@@ -1,21 +1,63 @@
-var server = module.exports;
+var EventEmitter = require('events').EventEmitter;
 
+var util   = require('util');
+var logger = require('./lib/logger');
+var _      = require('lodash');
 var net = require('net');
-var _ = require('lodash');
-
 var Buckets = require('./lib/buckets');
-var log = require('./lib/log');
 
 var RequestDecoder = require('./messages/decoders').RequestDecoder;
-var server_config = require('./lib/server_config');
-var db = require('./lib/db');
 
 var ClassValidator = require('./lib/pipeline/class_validator');
 var TokenExtractor = require('./lib/pipeline/token_extractor');
 var ResponseWriter = require('./lib/pipeline/response_writer');
 
-function connection_handler (socket) {
+var db = require('./lib/db');
+
+var defaults = {
+  port:      9231,
+  hostname:  '0.0.0.0',
+  log_level: 'info'
+};
+
+/*
+ * Creates an instance of LimitdServer.
+ *
+ * Options:
+ *
+ *  - `db` the path to the database. Required.
+ *  - `port` the port to listen to. Defaults to 9231.
+ *  - `hostname` the hostname to bind to. Defaults to INADDR_ANY
+ *  - `log_level` the verbosity of the logs. Defaults to 'info'.
+ *
+ */
+function LimitdServer (options) {
+  EventEmitter.call(this);
+  var self = this;
+
+
+  if (!options.db) {
+    throw new TypeError('"db" is required');
+  }
+
+  this._config = _.extend({}, defaults, options);
+  this._logger = logger(this._config.log_level);
+  this._server = net.createServer(this._handler.bind(this));
+
+  this._server.on('error', function (err) {
+    self.emit('error', err);
+  });
+
+  this._db = db(this._config.db);
+  this._buckets = new Buckets(this._db, this._config);
+}
+
+util.inherits(LimitdServer, EventEmitter);
+
+
+LimitdServer.prototype._handler = function (socket) {
   var sockets_details = _.pick(socket, ['remoteAddress', 'remotePort']);
+  var log = this._logger;
 
   log.debug(sockets_details, 'connection accepted');
 
@@ -27,43 +69,49 @@ function connection_handler (socket) {
   });
 
   socket.pipe(decoder)
-        .pipe(ClassValidator(server._buckets))
-        .pipe(TokenExtractor(server._buckets))
+        .pipe(ClassValidator(this._buckets))
+        .pipe(TokenExtractor(this._buckets))
         .pipe(ResponseWriter())
         .pipe(socket);
-}
+};
 
-server.start = function (options, callback) {
+LimitdServer.prototype.start = function (done) {
   var self = this;
-  var config = server_config.get(options);
+  var log = self._logger;
 
-  self._db = db.get(config);
-  self._buckets = new Buckets(self._db, config);
-
-  self._server = net.createServer(connection_handler);
-  self._server.listen(config.PORT, function(err) {
+  self._server.listen(this._config.port, this._config.hostname, function(err) {
     if (err) {
-      console.error("Initialization error\n", err.stack);
-      if (module.parent) {
-        if (callback) return callback(err);
-      } else {
-        return process.exit(1);
+      log.error(err, 'error starting server');
+      self.emit('error', err);
+      if (done) {
+        done(err);
       }
+      return;
     }
 
-    log.debug({port: config.PORT}, 'server started');
-
-    if (callback) {
-      callback(null, self._server.address());
+    var address = self._server.address();
+    log.debug(address, 'server started');
+    self.emit('started', address);
+    if (done) {
+      done(null, address);
     }
+  });
+
+  return this;
+};
+
+
+LimitdServer.prototype.close = function () {
+  var self = this;
+  var log = self._logger;
+  var address = self._server.address();
+
+  this._server.close(function() {
+    log.debug(address, 'server closed');
+    self.emit('close');
   });
 };
 
-server.stop = function (callback) {
-  this._server.close(callback);
-};
 
-if (!module.parent) {
-  server.start();
-  process.on('SIGTERM', stop);
-}
+module.exports = LimitdServer;
+

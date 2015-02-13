@@ -1,0 +1,11 @@
+db: /tmp/limid-example.db
+
+log_level: debug
+
+buckets:
+  ip:
+    size: 10
+    interval: 1000
+    per_interval: 1
+  wrong_password:
+    size: 3

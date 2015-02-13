@@ -10,6 +10,8 @@ var async = require('async');
 var _ = require('lodash');
 
 describe('limitd server', function () {
+  var server;
+
   before(function (done) {
     var db_file = __dirname + '/dbs/server.tests.db';
 
@@ -17,7 +19,9 @@ describe('limitd server', function () {
       rimraf.sync(db_file);
     } catch(err){}
 
-    LimitdServer.start({config_file: __dirname + '/fixture.yml', db: db_file}, function (err, address) {
+    server = new LimitdServer(_.extend({db: db_file}, require('./fixture')));
+
+    server.start(function (err, address) {
       if (err) return done(err);
       client = new LimitdClient(address);
       client.once('connect', done);
@@ -25,8 +29,7 @@ describe('limitd server', function () {
   });
 
   after(function () {
-    LimitdServer.stop();
-
+    server.close();
   });
 
   describe('TAKE', function () {
@@ -103,7 +106,7 @@ describe('limitd server', function () {
     client.take('ip', '211.45.66.1', function (err) {
       if (err) return done(err);
       setTimeout(function () {
-        LimitdServer._db.get('ÿipÿ211.45.66.1', function (err, result) {
+        server._db.get('ÿipÿ211.45.66.1', function (err, result) {
           assert.isUndefined(result);
           done();
         });

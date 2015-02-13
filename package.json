@@ -4,10 +4,10 @@
   "description": "Daemon for rate limiting using tocket buckets.",
   "main": "client.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --timeout 5000"
+    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000"
   },
   "bin": {
-    "limitd": "./server",
+    "limitd": "./bin/limitd",
     "limitdctl": "./bin/limitdctl"
   },
   "author": "",
@@ -15,6 +15,7 @@
   "dependencies": {
     "async": "~0.9.0",
     "bunyan": "~1.3.3",
+    "commander": "~2.6.0",
     "debug": "~2.1.1",
     "event-stream": "~3.2.2",
     "js-yaml": "~3.2.5",
@@ -25,9 +26,9 @@
     "level-ttl": "~2.2.0",
     "levelplus": "0.0.5",
     "lodash": "~3.1.0",
-    "minimist": "~1.1.0",
     "protobufjs": "~3.8.2",
     "randomstring": "~1.0.3",
+    "reconnect-net": "0.0.0",
     "through": "~2.3.6"
   },
   "devDependencies": {

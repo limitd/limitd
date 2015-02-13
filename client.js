@@ -1,8 +1,8 @@
-var Socket          = require('net').Socket;
 var EventEmitter    = require('events').EventEmitter;
 var util            = require('util');
 var randomstring    = require('randomstring');
-
+var reconnect = require('reconnect-net');
+var Socket = require('net').Socket;
 var RequestMessage  = require('./messages').Request;
 var ResponseMessage  = require('./messages').Response;
 var ResponseDecoder = require('./messages/decoders').ResponseDecoder;
@@ -10,21 +10,51 @@ var ResponseDecoder = require('./messages/decoders').ResponseDecoder;
 
 function LimitdClient (options) {
   EventEmitter.call(this);
-  this.socket = new Socket();
-  this.socket.connect(options.port, options.address || options.host);
-
-  var client = this;
-
-  this.socket.once('connect', function () {
-    client.emit('connect');
-  }).pipe(ResponseDecoder()).on('data', function (response) {
-    client.emit('response', response);
-    client.emit('response_' + response.request_id, response);
-  });
+  this._options = options;
+  this.connect();
 }
 
 util.inherits(LimitdClient, EventEmitter);
 
+LimitdClient.prototype.connect = function (done) {
+  var options = this._options;
+  var client = this;
+
+  // this.socket = reconnect(function (stream) {
+  //   this.socket.once('connect', function () {
+  // //   client.socket.setKeepAlive(true);
+  // //   client.emit('connect');
+  // //   if (done) {
+  // //     done();
+  // //   }
+  // // }).on('close', function (has_error) {
+  // //   client.emit('close', has_error);
+  // // }).on('error', function (err) {
+  // //   client.emit('error', err);
+  // // }).pipe(ResponseDecoder()).on('data', function (response) {
+  // //   client.emit('response', response);
+  // //   client.emit('response_' + response.request_id, response);
+  // // });
+  // }).connect(options.port, options.address || options.host);
+
+  this.socket = new Socket();
+  this.socket.connect(options.port, options.address || options.host);
+
+  this.socket.once('connect', function () {
+    client.socket.setKeepAlive(true);
+    client.emit('connect');
+    if (done) {
+      done();
+    }
+  }).on('close', function (has_error) {
+    client.emit('close', has_error);
+  }).on('error', function (err) {
+    client.emit('error', err);
+  }).pipe(ResponseDecoder()).on('data', function (response) {
+    client.emit('response', response);
+    client.emit('response_' + response.request_id, response);
+  });
+};
 
 LimitdClient.prototype._request = function (method, clazz, key, count, done) {
   if (typeof count === 'function') {
@@ -41,6 +71,12 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
     'method': RequestMessage.Method[method],
     'count':  count
   });
+
+  if (!this.socket.writable) {
+    return process.nextTick(function () {
+      done(new Error('The socket is closed.'));
+    });
+  }
 
   this.socket.write(request.encodeDelimited().toBuffer());
   this.once('response_' + request.id, function (response) {
