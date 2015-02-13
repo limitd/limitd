@@ -10,8 +10,8 @@
     "limitd": "./bin/limitd",
     "limitdctl": "./bin/limitdctl"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "José F. Romaniello <jfromaniello@gmail.com> (http://joseoncode.com)",
+  "license": "MIT",
   "dependencies": {
     "async": "~0.9.0",
     "bunyan": "~1.3.3",

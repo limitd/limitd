@@ -55,7 +55,6 @@ function LimitdServer (options) {
 
 util.inherits(LimitdServer, EventEmitter);
 
-
 LimitdServer.prototype._handler = function (socket) {
   var sockets_details = _.pick(socket, ['remoteAddress', 'remotePort']);
   var log = this._logger;
@@ -101,7 +100,6 @@ LimitdServer.prototype.start = function (done) {
 
   return this;
 };
-
 
 LimitdServer.prototype.close = function () {
   var self = this;

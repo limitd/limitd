@@ -13,18 +13,16 @@ The core concepts of limitd are:
 -  **Bucket Instance**: is the incarnation of a bucket. Eg: **Customer 123 Api Call**. Bucket instances are:
     -  Created on demand.
     -  Destroyed when not used.
--  **Request**: a request made by a client to take **N tokens** from the **bucket instance X** of the **bucket class y**.
+-  **Request**: a request made by a client to take or wait **N tokens** from the **bucket instance X** of the **bucket class y**.
 -  **Response**: is the response from the server to a client request indicating that the operation was succesful or not.
 
-Limitd doesn't take care of throttling, the application is in charge of handling non-conformant traffic.
-
-Limitd uses protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [/blob/master/messages/limitd.proto].
+Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [messages/limitd.proto](/blob/master/messages/limitd.proto).
 
 ## Server operations
 
 -  **TAKE**: remove one or more tokens from the bucket. The server will respond inmediately with `conformant` true/false depending if there are sufficient tokens.
 -  **WAIT**: remove one or more tokens from the bucket. If there are insufficient tokens in the bucket the server will not respond the request until there are enought tokens.
--  **PUT**: fill the bucket with one or more tokens. The max amount of tokens depends on the size of the bucket. This is useful in cases that the application need to reset a bucket that's not autofilled by limitd.
+-  **PUT**: fill the bucket with one or more tokens. The max amount of tokens depends on the size of the bucket. This is useful when the application need to reset a bucket that's not autofilled by limitd.
 
 ## About this module
 
@@ -85,17 +83,27 @@ var limitdClient = new LimitdClient({
 });
 ```
 
-Example express middleware:
+Example express middleware (responding 429):
 
 ```javascript
 app.use(function (req, res, next) {
-  limitdClient.request('ip', req.ip, function (err, resp) {
+  limitdClient.take('ip', req.ip, function (err, resp) {
     if (err) return next(err);
     if (resp.conformant) return next();
 
     // The 429 status code indicates that the user has sent too many
     // requests in a given amount of time ("rate limiting").
     res.send('429');
+  });
+})
+```
+
+Example express middleware (throttling):
+
+```javascript
+app.use(function (req, res, next) {
+  limitdClient.wait('ip', req.ip, function (err) {
+    next();
   });
 })
 ```
@@ -130,4 +138,4 @@ $ echo $?
 
 ## License
 
-MIT 2014 - Auth0 INC,
+MIT 2014 - Auth0 INC.
