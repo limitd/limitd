@@ -1,12 +1,11 @@
 {
   "name": "limitd",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Daemon for rate limiting using tocket buckets.",
   "main": "client.js",
-  "repository":
-  {
-    "type" : "git",
-    "url" : "http://github.com/auth0/limitd.git"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/auth0/limitd.git"
   },
   "scripts": {
     "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000"
