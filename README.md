@@ -69,7 +69,7 @@ Create a daemon (upstart, systemd, initd, etc.) that runs the following command
 limitd --config-file /etc/limitd.config > /var/log/limitd.log
 ```
 
-## Motivations
+## Motivation
 
 While there are many solutions that relies on a central database like redis, these solutions tipically put all the configuration, limits and logic on the application side.
 
