@@ -61,7 +61,7 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
     'count':  count
   });
 
-  if (!this.stream || this.stream.writable) {
+  if (!this.stream || !this.stream.writable) {
     return process.nextTick(function () {
       done(new Error('The socket is closed.'));
     });
