@@ -1,6 +1,6 @@
 limitd is a simple daemon for rate limiting highly available applications.
 
-## Exmaple usage in node.js
+## Example usage in node.js
 
 Initialize the limitd client as follows:
 
