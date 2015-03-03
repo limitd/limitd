@@ -57,10 +57,12 @@ buckets:
     size:         10
     per_interval: 1
     interval:     200
+    override:
+      127.0.0.1:
+        size: 10000
+        per_interval: 100
   user:
     size:         5
-    per_interval: 1
-    interval:     10000
 ```
 
 Create a daemon (upstart, systemd, initd, etc.) that runs the following command
