@@ -1,4 +1,52 @@
 #!/usr/bin/env node
 
-console.error('not implemented yet');
-process.exit(1);
+var program = require('commander');
+var LimitdClient = require('../client');
+var _ = require('lodash');
+
+program.version(require('../package').version)
+  .option('-p --port [9231]', 'Port to bind [9231].', '9231')
+  .option('-h --hostname [0.0.0.0]', 'Hostname to bind [0.0.0.0].', '0.0.0.0')
+  .option('-b --bucket <bucket>', 'Bucket class')
+  .option('-k --key <key>', 'Bucket key')
+  .option('-t --take <n>', 'Take or fail n tokens from the bucket.', parseInt)
+  .option('-w --wait <n>', 'Take or wait n tokens from the bucket.', parseInt)
+  .option('-p --put <n>', 'Put n tokens in the bucket.', parseInt)
+  .parse(process.argv);
+
+if (!program.bucket) {
+  console.error('"bucket" is required');
+  return process.exit(1);
+}
+
+if (!program.key) {
+  console.error('"key" is required');
+  return process.exit(1);
+}
+
+var methods = _.intersection(['take', 'wait', 'put'], Object.keys(program));
+if (methods.length > 1 || methods.length === 0) {
+  console.error('one and only one method must be provided take, wait or put');
+  return process.exit(1);
+}
+
+var method = methods[0];
+var config = _.pick(program, ['port', 'hostname']);
+var client = new LimitdClient(config);
+
+client.once('ready', function () {
+  client[method](program.bucket, program.key, program[method], function (err, result) {
+    if (err) {
+      console.error(err.message);
+      return process.exit(1);
+    }
+    if (!result.conformant) {
+      console.error('not enough tokens in the bucket');
+      return process.exit(1);
+    }
+    process.exit(0);
+  });
+}).on('error', function (err) {
+  console.error(err.message);
+  process.exit(1);
+});

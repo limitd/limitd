@@ -32,7 +32,7 @@ LimitdClient.prototype.connect = function (done) {
     });
 
     client.stream = stream;
-
+    client.emit('ready');
   }).once('connect', function () {
     client.emit('connect');
     if (done) {
