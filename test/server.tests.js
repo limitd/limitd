@@ -67,6 +67,18 @@ describe('limitd server', function () {
         });
       });
     });
+
+    it('should be conformant if an override allows it', function (done) {
+      async.each(_.range(0, 10), function (i, cb) {
+        client.take('ip', '127.0.0.1', cb);
+      }, function (err) {
+        if (err) return done(err);
+        client.take('ip', '127.0.0.1', function (err, response) {
+          assert.ok(response.conformant);
+          done();
+        });
+      });
+    });
   });
 
 
