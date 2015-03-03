@@ -54,15 +54,15 @@ db: /var/limitd/database
 #Define the classes of buckets
 buckets:
   ip:
-    size:         10
+    size: 10
     per_interval: 1
-    interval:     200
+    interval: 200
     override:
       127.0.0.1:
         size: 10000
         per_interval: 100
   user:
-    size:         5
+    size: 5
 ```
 
 Create a daemon (upstart, systemd, initd, etc.) that runs the following command
