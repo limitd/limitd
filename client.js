@@ -52,8 +52,8 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
     count = method == 'PUT' ? 'all' : 1;
   }
 
-  if (!done) {
-    done = function(){};
+  if (typeof count === 'undefined') {
+    count = method == 'PUT' ? 'all' : 1;
   }
 
   var request = new RequestMessage({
@@ -76,6 +76,9 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
   }
 
   this.stream.write(request.encodeDelimited().toBuffer());
+
+  if (!done) return;
+
   this.once('response_' + request.id, function (response) {
     if (response.type === ResponseMessage.Type.ERROR &&
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_CLASS) {
