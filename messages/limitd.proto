@@ -46,11 +46,12 @@ message TakeResponse {
     optional TakeResponse response = 101; // Unique Animal extension number
   }
 
-  required bool conformant = 2;
-  optional bool delayed = 3 [default = false];
+  required bool conformant = 1;
+  optional bool delayed = 2 [default = false];
 
-  required int32 remaining = 4;
-  required int32 reset = 5;
+  required int32 remaining = 3;
+  required int32 reset = 4;
+  required int32 limit = 5;
 }
 
 

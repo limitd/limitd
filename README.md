@@ -25,6 +25,13 @@ Example with express responding [429 Too Many Requests](http://tools.ietf.org/ht
 app.use(function (req, res, next) {
   limitd.take('user', req.username, function (err, resp) {
     if (err) return next(err);
+
+    req.set({
+      'X-RateLimit-Limit':     resp.limit,
+      'X-RateLimit-Remaining': resp.remaining
+      'X-RateLimit-Reset':     resp.reset
+    });
+
     if (resp.conformant) return next();
 
     // The 429 status code indicates that the user has sent too many

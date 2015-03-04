@@ -37,6 +37,10 @@ describe('limitd server', function () {
       client.take('ip', '211.123.12.12', function (err, response) {
         if (err) return done(err);
         assert.ok(response.conformant);
+        assert.equal(response.remaining, 9);
+        var expected_reset = Math.floor((new Date()).getTime() / 1000) + 200;
+        assert.equal(response.reset, expected_reset);
+        assert.equal(response.limit, 10);
         done();
       });
     });
@@ -89,12 +93,17 @@ describe('limitd server', function () {
         assert.ok(response.conformant);
         assert.notOk(response.delayed);
 
+
+        assert.equal(response.remaining, 9);
+        var expected_reset = Math.floor((new Date()).getTime() / 1000) + 200;
+        assert.equal(response.reset, expected_reset);
+
         done();
       });
     });
 
 
-    it('should return false when traffic is not conformant', function (done) {
+    it('should be delayed when traffic is non conformant', function (done) {
       async.each(_.range(0, 10), function (i, cb) {
         client.wait('ip', '211.76.23.5', cb);
       }, function (err) {
