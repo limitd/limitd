@@ -49,7 +49,7 @@ LimitdClient.prototype.connect = function (done) {
 LimitdClient.prototype._request = function (method, clazz, key, count, done) {
   if (typeof count === 'function') {
     done = count;
-    count = 1;
+    count = method == 'PUT' ? 'all' : 1;
   }
   if (!done) {
     done = function(){};
@@ -80,7 +80,7 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_CLASS) {
       return done(new Error(clazz + ' is not a valid bucket class'));
     }
-    done(null, response['.limitd.TakeResponse.response']);
+    done(null, response['.limitd.TakeResponse.response'] || response['.limitd.PutResponse.response']);
   });
 };
 
@@ -88,15 +88,12 @@ LimitdClient.prototype.take = function (clazz, key, count, done) {
   return this._request('TAKE', clazz, key, count, done);
 };
 
+LimitdClient.prototype.reset =
 LimitdClient.prototype.put = function (clazz, key, count, done) {
   return this._request('PUT', clazz, key, count, done);
 };
 
 LimitdClient.prototype.wait = function (clazz, key, count, done) {
-  if (typeof count === 'function') {
-    done = count;
-    count = 'all';
-  }
   return this._request('WAIT', clazz, key, count, done);
 };
 

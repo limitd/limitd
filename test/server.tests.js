@@ -147,7 +147,7 @@ describe('limitd server', function () {
           if (err) return done(err);
           client.take('ip', '211.123.12.12', function (err, response) {
             if (err) return done(err);
-            expect(response.remaining, 9);
+            assert.equal(response.remaining, 9);
             done();
           });
         });
@@ -155,13 +155,17 @@ describe('limitd server', function () {
     });
 
     it('should be able to reset the bucket', function (done) {
-      client.take('ip', '211.123.12.12', 5, function (err) {
+      client.take('ip', '211.1.1.12', 5, function (err, response) {
         if (err) return done(err);
-        client.put('ip', '211.123.12.12', function (err) {
+        assert.equal(response.remaining, 5);
+
+        client.put('ip', '211.1.1.12', function (err, response) {
           if (err) return done(err);
-          client.take('ip', '211.123.12.12', function (err, response) {
+          assert.equal(response.remaining, 10);
+
+          client.take('ip', '211.1.1.12', function (err, response) {
             if (err) return done(err);
-            expect(response.remaining, 9);
+            assert.equal(response.remaining, 9);
             done();
           });
         });
