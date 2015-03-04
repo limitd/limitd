@@ -51,6 +51,7 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
     done = count;
     count = method == 'PUT' ? 'all' : 1;
   }
+
   if (!done) {
     done = function(){};
   }
