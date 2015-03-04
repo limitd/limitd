@@ -17,15 +17,40 @@ message Request {
 }
 
 message Response {
+  extensions 100 to max;
+
   required string request_id = 1;
-  required bool conformant = 2;
 
-  optional bool delayed = 3 [default = false];
+  enum Type {
+    Error = 1;
+    Take = 2;
+  }
 
-  enum ErrorType {
-    NO_ERROR = 0;
+  required Type type = 2;
+}
+
+message ErrorResponse {
+  extend Response {
+    optional ErrorResponse response = 100; // Unique Animal extension number
+  }
+
+  enum Type {
     UNKNOWN_BUCKET_CLASS = 1;
   }
 
-  optional ErrorType error = 4 [default = NO_ERROR];
+  required Type type = 1;
 }
+
+message TakeResponse {
+  extend Response {
+    optional TakeResponse response = 101; // Unique Animal extension number
+  }
+
+  required bool conformant = 2;
+  optional bool delayed = 3 [default = false];
+
+  required int32 remaining = 4;
+  required int32 reset = 5;
+}
+
+

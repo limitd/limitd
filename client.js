@@ -4,6 +4,7 @@ var randomstring     = require('randomstring');
 var reconnect        = require('reconnect-net');
 var RequestMessage   = require('./messages').Request;
 var ResponseMessage  = require('./messages').Response;
+var ErrorResponse  = require('./messages').ErrorResponse;
 var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
 var url              = require('url');
 var _                = require('lodash');
@@ -69,10 +70,11 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
 
   this.stream.write(request.encodeDelimited().toBuffer());
   this.once('response_' + request.id, function (response) {
-    if (response.error === ResponseMessage.ErrorType.UNKNOWN_BUCKET_CLASS) {
+    if (response.type === ResponseMessage.Type.Error &&
+        response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_CLASS) {
       return done(new Error(clazz + ' is not a valid bucket class'));
     }
-    done(null, response);
+    done(null, response['.limitd.TakeResponse.response']);
   });
 };
 
