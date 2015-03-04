@@ -54,13 +54,19 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
   if (!done) {
     done = function(){};
   }
+
   var request = new RequestMessage({
     'id':     randomstring.generate(7),
     'class':  clazz,
     'key':    key,
     'method': RequestMessage.Method[method],
-    'count':  count
   });
+
+  if (count === 'all') {
+    request.set('all', true);
+  } else {
+    request.set('count', count);
+  }
 
   if (!this.stream || !this.stream.writable) {
     return process.nextTick(function () {
@@ -70,7 +76,7 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
 
   this.stream.write(request.encodeDelimited().toBuffer());
   this.once('response_' + request.id, function (response) {
-    if (response.type === ResponseMessage.Type.Error &&
+    if (response.type === ResponseMessage.Type.ERROR &&
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_CLASS) {
       return done(new Error(clazz + ' is not a valid bucket class'));
     }
@@ -87,6 +93,10 @@ LimitdClient.prototype.put = function (clazz, key, count, done) {
 };
 
 LimitdClient.prototype.wait = function (clazz, key, count, done) {
+  if (typeof count === 'function') {
+    done = count;
+    count = 'all';
+  }
   return this._request('WAIT', clazz, key, count, done);
 };
 

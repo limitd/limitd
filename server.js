@@ -12,6 +12,7 @@ var ClassValidator = require('./lib/pipeline/class_validator');
 var ResponseWriter = require('./lib/pipeline/response_writer');
 var RemoveToken = require('./lib/pipeline/remove_token');
 var WaitToken = require('./lib/pipeline/wait_token');
+var PutToken = require('./lib/pipeline/put_tokens');
 
 var db = require('./lib/db');
 
@@ -72,6 +73,7 @@ LimitdServer.prototype._handler = function (socket) {
         .pipe(ClassValidator(this._buckets))
         .pipe(RemoveToken(this._buckets, log))
         .pipe(WaitToken(this._buckets, log))
+        .pipe(PutToken(this._buckets, log))
         .pipe(ResponseWriter())
         .pipe(socket);
 };

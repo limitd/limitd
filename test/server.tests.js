@@ -138,4 +138,36 @@ describe('limitd server', function () {
     });
   });
 
+
+  describe('PUT', function () {
+    it('should restore the bucket when reseting', function (done) {
+      client.take('ip', '211.123.12.12', function (err, response) {
+        if (err) return done(err);
+        client.put('ip', '211.123.12.12', function (err, response) {
+          if (err) return done(err);
+          client.take('ip', '211.123.12.12', function (err, response) {
+            if (err) return done(err);
+            expect(response.remaining, 9);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should be able to reset the bucket', function (done) {
+      client.take('ip', '211.123.12.12', 5, function (err) {
+        if (err) return done(err);
+        client.put('ip', '211.123.12.12', function (err) {
+          if (err) return done(err);
+          client.take('ip', '211.123.12.12', function (err, response) {
+            if (err) return done(err);
+            expect(response.remaining, 9);
+            done();
+          });
+        });
+      });
+    });
+
+  });
+
 });

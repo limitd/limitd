@@ -14,6 +14,7 @@ message Request {
   required Method method = 4;
 
   optional int32 count = 5 [default = 1];
+  optional bool all = 6 [default = false];
 }
 
 message Response {
@@ -22,8 +23,9 @@ message Response {
   required string request_id = 1;
 
   enum Type {
-    Error = 1;
-    Take = 2;
+    ERROR = 1;
+    TAKE = 2;
+    PUT = 2;
   }
 
   required Type type = 2;
@@ -54,4 +56,12 @@ message TakeResponse {
   required int32 limit = 5;
 }
 
+message PutResponse {
+  extend Response {
+    optional PutResponse response = 102; // Unique Animal extension number
+  }
 
+  required int32 remaining = 1;
+  required int32 reset = 2;
+  required int32 limit = 3;
+}

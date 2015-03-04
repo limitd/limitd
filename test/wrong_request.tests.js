@@ -34,7 +34,7 @@ describe('wrong requests', function () {
       .once('connect', function () {
         socket.write(new ResponseMessage({
           request_id: '123',
-          type: ResponseMessage.Type.Take
+          type: ResponseMessage.Type.TAKE
         }).encodeDelimited().toBuffer());
       }).once('close', function () {
         done();
