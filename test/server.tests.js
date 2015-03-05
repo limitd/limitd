@@ -39,12 +39,13 @@ describe('limitd server', function () {
         if (err) return done(err);
         assert.ok(response.conformant);
         assert.equal(response.remaining, 9);
-        var expected_reset = Math.floor((new Date()).getTime() / 1000) + 200;
+        var expected_reset = Math.floor((new Date()).getTime() / 1000) + 1;
         assert.equal(response.reset, expected_reset);
         assert.equal(response.limit, 10);
         done();
       });
     });
+
 
     it('should work with a fixed bucket', function (done) {
       async.map(_.range(0, 3), function (i, cb) {
@@ -84,8 +85,42 @@ describe('limitd server', function () {
         });
       });
     });
-  });
 
+    describe('next reset', function(){
+      var oldGetTime = Date.prototype.getTime;
+      var time = 1425592926400;
+      beforeEach(function(){
+        Date.prototype.getTime = function(){
+          return time;
+        };
+      });
+
+      afterEach(function(){
+        Date.prototype.getTime = oldGetTime;
+      });
+
+      it('should use seconds ceiling for next reset', function (done) {
+        // it takes ~1790 msec to fill the bucket with this test
+        var expected_time = 1425592928;
+        var requests = _.map(_.range(0, 9), function(){
+          return function (cb) {
+            client.take('ip', '211.123.12.36', cb);
+          };
+        });
+        async.series(requests, function (err, results) {
+          if (err) return done(err);
+          var lastResponse = results[results.length -1];
+          if (err) return done(err);
+          assert.ok(lastResponse.conformant);
+          assert.equal(lastResponse.remaining, 1);
+          var expected_reset = Math.ceil(time / 1000) + 2;
+          assert.equal(lastResponse.reset, expected_reset);
+          assert.equal(lastResponse.limit, 10);
+          done();
+        });
+      });
+    });
+  });
 
   describe('WAIT', function () {
     it('should work with a simple request', function (done) {
@@ -96,7 +131,7 @@ describe('limitd server', function () {
 
 
         assert.equal(response.remaining, 9);
-        var expected_reset = Math.floor((new Date()).getTime() / 1000) + 200;
+        var expected_reset = Math.floor((new Date()).getTime() / 1000) + 1;
         assert.equal(response.reset, expected_reset);
 
         done();

@@ -64,12 +64,11 @@ db: /var/limitd/database
 buckets:
   ip:
     size: 10
-    per_interval: 1
-    interval: 200
+    per_second: 5
     override:
       127.0.0.1:
         size: 10000
-        per_interval: 100
+        per_second: 500
   user:
     size: 5
 ```
