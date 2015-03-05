@@ -9,11 +9,18 @@ var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
 var url              = require('url');
 var _                = require('lodash');
 
+var DEFAULT_PORT = 9231;
+var DEFAULT_HOST = 'localhost';
+
 function LimitdClient (options) {
+  options = options || {};
   EventEmitter.call(this);
   if (typeof options === 'string') {
     options = _.pick(url.parse(options), ['port', 'hostname']);
-    options.port = parseInt(options.port || 9231, 10);
+    options.port = parseInt(options.port || DEFAULT_PORT, 10);
+  } else {
+    options.port = options.port || DEFAULT_PORT;
+    options.host = options.port || DEFAULT_HOST;
   }
   this._options = options;
   this.connect();
