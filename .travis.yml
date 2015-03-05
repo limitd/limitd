@@ -2,12 +2,3 @@ language: node_js
 node_js:
 - 0.10
 - 0.12
-deploy:
-  provider: npm
-  email: jfromaniello
-  api_key:
-    secure: lgDHOpGnibRU0KpV++mB75Bc+DXBpMxesZt6OOV6joQpIn7RKEmOa5f3aj49k5otbE5+zwkICqoAmhstX9VHEOEx+tg350iZaIJMcC2CyUna2HcXmrgz8bBD85ul6Aav2/X9wk/P6ncIbVLLWe2b1A7EvTpwOzmPj7ARsKpjkEg=
-  on:
-    tags: true
-    repo: auth0/limitd
-    all_branches: true
