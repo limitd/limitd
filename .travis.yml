@@ -1,4 +1,12 @@
 language: node_js
 node_js:
-  - 0.10
-  - 0.12
+- 0.1
+- 0.12
+deploy:
+  provider: npm
+  email: jfromaniello@gmail.com
+  api_key:
+    secure: g4G+wl7wY+j680domgnZadwnRnWe1CMOJlO980FAy4+6YP74Pa5Pf1q7dXG/wrnd5C1pgyYGG2PJ7h6HQUrO/6AjFXBAqANEE+gMRcnvuL3WH7kjsxUtYc1U9J4aG60FWyzgk4eV6n7xN59Jrca8o30cIzuzTydVdz0fyBTQF8k=
+  on:
+    tags: true
+    repo: auth0/limitd
