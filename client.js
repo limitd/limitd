@@ -46,7 +46,7 @@ LimitdClient.prototype.connect = function (done) {
   }).connect(options.port, options.address || options.hostname || options.host);
 };
 
-LimitdClient.prototype._request = function (method, clazz, key, count, done) {
+LimitdClient.prototype._request = function (method, type, key, count, done) {
   if (typeof count === 'function') {
     done = count;
     count = method == 'PUT' ? 'all' : 1;
@@ -58,7 +58,7 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
 
   var request = new RequestMessage({
     'id':     randomstring.generate(7),
-    'class':  clazz,
+    'type':  type,
     'key':    key,
     'method': RequestMessage.Method[method],
   });
@@ -81,24 +81,24 @@ LimitdClient.prototype._request = function (method, clazz, key, count, done) {
 
   this.once('response_' + request.id, function (response) {
     if (response.type === ResponseMessage.Type.ERROR &&
-        response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_CLASS) {
-      return done(new Error(clazz + ' is not a valid bucket class'));
+        response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_TYPE) {
+      return done(new Error(type + ' is not a valid bucket type'));
     }
     done(null, response['.limitd.TakeResponse.response'] || response['.limitd.PutResponse.response']);
   });
 };
 
-LimitdClient.prototype.take = function (clazz, key, count, done) {
-  return this._request('TAKE', clazz, key, count, done);
+LimitdClient.prototype.take = function (type, key, count, done) {
+  return this._request('TAKE', type, key, count, done);
 };
 
 LimitdClient.prototype.reset =
-LimitdClient.prototype.put = function (clazz, key, count, done) {
-  return this._request('PUT', clazz, key, count, done);
+LimitdClient.prototype.put = function (type, key, count, done) {
+  return this._request('PUT', type, key, count, done);
 };
 
-LimitdClient.prototype.wait = function (clazz, key, count, done) {
-  return this._request('WAIT', clazz, key, count, done);
+LimitdClient.prototype.wait = function (type, key, count, done) {
+  return this._request('WAIT', type, key, count, done);
 };
 
 module.exports = LimitdClient;

@@ -58,7 +58,7 @@ port: 9001
 #path where the data will be stored
 db: /var/limitd/database
 
-#Define the classes of buckets
+#Define the types of buckets
 buckets:
   ip:
     size: 10
@@ -87,11 +87,11 @@ While there are many solutions that relies on a central database like redis, the
 The core concepts of limitd are:
 
 -  [Token Bucket](http://en.wikipedia.org/wiki/Token_bucket): is the main algorithm used by limitd.
--  **Bucket Class**: defines the behavior of a bucket instance. Classes are defined in the configuration of the server. Eg: **ApiCall** 150 per hour.
+-  **Bucket Type**: defines the behavior of a bucket instance. Types are defined in the configuration of the server. Eg: **ApiCall** 150 per hour.
 -  **Bucket Instance**: is the incarnation of a bucket. Eg: **Customer 123 Api Call**. Bucket instances are:
     -  Created on demand.
     -  Destroyed when not used.
--  **Request**: a request made by a client to  **take or wait** N tokens from the **bucket instance X** of the **bucket class y**.
+-  **Request**: a request made by a client to  **take or wait** N tokens from the **bucket instance X** of the **bucket type y**.
 -  **Response**: is the response from the server to a client request indicating that the operation was succesful or not.
 
 Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [messages/limitd.proto](/blob/master/messages/limitd.proto).

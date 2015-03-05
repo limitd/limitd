@@ -119,9 +119,9 @@ describe('limitd server', function () {
     });
   });
 
-  it('should fail when the bucket class doesnt exist', function (done) {
+  it('should fail when the bucket type doesnt exist', function (done) {
     client.take('blabla', '211.123.12.12', function (err) {
-      assert.equal(err.message, 'blabla is not a valid bucket class');
+      assert.equal(err.message, 'blabla is not a valid bucket type');
       done();
     });
   });
