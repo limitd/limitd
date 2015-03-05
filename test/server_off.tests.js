@@ -1,4 +1,4 @@
-var LimitdClient = require('../client');
+var LimitdClient = require('..').Client;
 var assert = require('chai').assert;
 
 

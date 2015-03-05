@@ -5,8 +5,8 @@ limitd is a simple daemon for rate limiting highly available applications.
 Initialize the limitd client as follows:
 
 ```javascript
-var Limitd = require('limitd');
-var limitd = new Limitd('limitd://10.0.0.23:9231');
+var LimitdClient = require('limitd').Client;
+var limitd = new LimitdClient('limitd://10.0.0.23:9231');
 ```
 
 Example with express throttling requests:

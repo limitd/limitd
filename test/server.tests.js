@@ -1,5 +1,5 @@
-var LimitdServer = require('../server');
-var LimitdClient = require('../client');
+var LimitdServer = require('..').Server;
+var LimitdClient = require('..').Client;
 
 var assert = require('chai').assert;
 var expect = require('chai').expect;

@@ -1,4 +1,4 @@
-var LimitdServer = require('../server');
+var LimitdServer = require('..').Server;
 
 var Socket = require('net').Socket;
 var rimraf = require('rimraf');
