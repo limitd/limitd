@@ -4,6 +4,7 @@ var LimitdClient = require('../client');
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 var rimraf = require('rimraf');
+var path   = require('path');
 var client;
 
 var async = require('async');
@@ -13,7 +14,7 @@ describe('limitd server', function () {
   var server;
 
   before(function (done) {
-    var db_file = __dirname + '/dbs/server.tests.db';
+    var db_file = path.join(__dirname, 'dbs', 'server.tests.db');
 
     try{
       rimraf.sync(db_file);
