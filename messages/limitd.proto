@@ -2,7 +2,7 @@ package limitd;
 
 message Request {
   required string id = 1;
-  required string class = 2;
+  required string type = 2;
   required string key = 3;
 
   enum Method {
@@ -37,7 +37,7 @@ message ErrorResponse {
   }
 
   enum Type {
-    UNKNOWN_BUCKET_CLASS = 1;
+    UNKNOWN_BUCKET_TYPE = 1;
   }
 
   required Type type = 1;

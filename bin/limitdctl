@@ -7,7 +7,7 @@ var _ = require('lodash');
 program.version(require('../package').version)
   .option('-p --port [9231]', 'Port to bind [9231].', '9231')
   .option('-h --hostname [0.0.0.0]', 'Hostname to bind [0.0.0.0].', '0.0.0.0')
-  .option('-b --bucket <bucket>', 'Bucket class')
+  .option('-b --bucket <bucket>', 'Bucket type')
   .option('-k --key <key>', 'Bucket key')
   .option('-t --take <n>', 'Take or fail n tokens from the bucket.', parseInt)
   .option('-w --wait <n>', 'Take or wait n tokens from the bucket.', parseInt)
