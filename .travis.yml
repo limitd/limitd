@@ -4,9 +4,9 @@ node_js:
 - 0.12
 deploy:
   provider: npm
-  email: jfromaniello@gmail.com
+  email: jfromaniello
   api_key:
-    secure: g4G+wl7wY+j680domgnZadwnRnWe1CMOJlO980FAy4+6YP74Pa5Pf1q7dXG/wrnd5C1pgyYGG2PJ7h6HQUrO/6AjFXBAqANEE+gMRcnvuL3WH7kjsxUtYc1U9J4aG60FWyzgk4eV6n7xN59Jrca8o30cIzuzTydVdz0fyBTQF8k=
+    secure: lgDHOpGnibRU0KpV++mB75Bc+DXBpMxesZt6OOV6joQpIn7RKEmOa5f3aj49k5otbE5+zwkICqoAmhstX9VHEOEx+tg350iZaIJMcC2CyUna2HcXmrgz8bBD85ul6Aav2/X9wk/P6ncIbVLLWe2b1A7EvTpwOzmPj7ARsKpjkEg=
   on:
     tags: true
     repo: auth0/limitd
