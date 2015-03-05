@@ -20,7 +20,7 @@ function LimitdClient (options) {
     options.port = parseInt(options.port || DEFAULT_PORT, 10);
   } else {
     options.port = options.port || DEFAULT_PORT;
-    options.host = options.port || DEFAULT_HOST;
+    options.host = options.host || DEFAULT_HOST;
   }
   this._options = options;
   this.connect();
