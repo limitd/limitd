@@ -29,7 +29,7 @@ describe('limitd server', function () {
   });
 
   after(function () {
-    server.close();
+    server.stop();
   });
 
   describe('TAKE', function () {
