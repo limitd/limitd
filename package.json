@@ -2,7 +2,7 @@
   "name": "limitd",
   "version": "2.2.0",
   "description": "Daemon for rate limiting using tocket buckets.",
-  "main": "client.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "http://github.com/auth0/limitd.git"
