@@ -113,7 +113,7 @@ describe('limitd server', function () {
         client.wait('ip', '211.76.23.5', 3, function (err, response) {
           assert.ok(response.conformant);
           assert.ok(response.delayed);
-          expect(Date.now() - waitingSince).to.be.within(580, 620);
+          expect(Date.now() - waitingSince).to.be.within(540, 620);
           done();
         });
       });
