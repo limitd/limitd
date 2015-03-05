@@ -77,9 +77,14 @@ LimitdClient.prototype._request = function (method, type, key, count, done) {
   }
 
   if (!this.stream || !this.stream.writable) {
-    return process.nextTick(function () {
-      done(new Error('The socket is closed.'));
-    });
+    var err = new Error('The socket is closed.');
+    if (done) {
+      return process.nextTick(function () {
+        done(err);
+      });
+    } else {
+      throw err;
+    }
   }
 
   this.stream.write(request.encodeDelimited().toBuffer());
