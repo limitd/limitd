@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/auth0/limitd.svg)](https://travis-ci.org/auth0/limitd)
+
 limitd is a simple daemon for rate limiting highly available applications.
 
 ## Example usage in node.js
@@ -26,9 +28,9 @@ app.use(function (req, res, next) {
   limitd.take('user', req.username, function (err, resp) {
     if (err) return next(err);
 
-    req.set({
+    res.set({
       'X-RateLimit-Limit':     resp.limit,
-      'X-RateLimit-Remaining': resp.remaining
+      'X-RateLimit-Remaining': resp.remaining,
       'X-RateLimit-Reset':     resp.reset
     });
 
