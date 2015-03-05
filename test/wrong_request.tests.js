@@ -3,12 +3,13 @@ var LimitdServer = require('../server');
 var Socket = require('net').Socket;
 var rimraf = require('rimraf');
 var _ = require('lodash');
+var path = require('path')
 
 describe('wrong requests', function () {
   var server, address;
 
   before(function (done) {
-    var db_file = __dirname + '/dbs/unexpected_conditions.db';
+    var db_file = path.join(__dirname, 'dbs', 'unexpected_conditions.db');
     try{
       rimraf.sync(db_file);
     } catch(err){}
