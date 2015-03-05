@@ -33,7 +33,7 @@ var server = new LimitdServer(config);
 server.start();
 
 process.on('SIGTERM', function () {
-  server.close(function () {
+  server.stop(function () {
     process.exit(0);
   });
   setTimeout(function () {

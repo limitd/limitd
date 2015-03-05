@@ -23,7 +23,7 @@ describe('wrong requests', function () {
   });
 
   after(function () {
-    server.close();
+    server.stop();
   });
 
   it('should disconnect the socket on unknown message', function (done) {

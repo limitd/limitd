@@ -103,7 +103,7 @@ LimitdServer.prototype.start = function (done) {
   return this;
 };
 
-LimitdServer.prototype.close = function () {
+LimitdServer.prototype.stop = function () {
   var self = this;
   var log = self._logger;
   var address = self._server.address();
