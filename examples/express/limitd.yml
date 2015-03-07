@@ -1,4 +1,4 @@
-db: /tmp/limid-example.db
+db: /tmp/limitd-example.db
 
 log_level: debug
 
