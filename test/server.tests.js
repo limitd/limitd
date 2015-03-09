@@ -133,15 +133,15 @@ describe('limitd server', function () {
 
 
     it('should be delayed when traffic is non conformant', function (done) {
-      async.each(_.range(0, 10), function (i, cb) {
-        client.wait('ip', '211.76.23.5', cb);
-      }, function (err) {
+      client.take('ip', '211.76.23.5', 10, function (err) {
         if (err) return done(err);
         var waitingSince = Date.now();
         client.wait('ip', '211.76.23.5', 3, function (err, response) {
+          var waited = Date.now() - waitingSince;
+          console.log('waited', waited);
           assert.ok(response.conformant);
           assert.ok(response.delayed);
-          expect(Date.now() - waitingSince).to.be.within(540, 600);
+          expect(waited).to.be.closeTo(600, 10);
           done();
         });
       });
