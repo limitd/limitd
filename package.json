@@ -8,7 +8,7 @@
     "url": "http://github.com/auth0/limitd.git"
   },
   "scripts": {
-    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000"
+    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --require ./test/util/fakeDate.js"
   },
   "bin": {
     "limitd": "./bin/limitd",
