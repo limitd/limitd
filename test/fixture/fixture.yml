@@ -2,11 +2,11 @@ port: 9001
 
 buckets:
   ip:
-    size:         10
+    size: 10
     per_second: 5
     override:
       127.0.0.1:
         size: 1000
         per_second: 500
   wrong_password:
-    size:         3
+    size: 3
