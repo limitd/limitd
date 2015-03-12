@@ -2,28 +2,52 @@
 
 limitd is a simple daemon for rate limiting highly available applications.
 
-## Example usage in node.js
+## Usage
+In order to use **limitd** you need to setup the server and consume it from the client.
 
-Initialize the limitd client as follows:
+This example assumes that you want to implement rate limiting for an express application.
+
+### Server setup
+Install the **limitd** server:
+```
+npm i -g limitd
+```
+
+Create a file named `limitd.config` for the server settings:
+```yaml
+#port to listen on
+port: 9001
+
+#db path
+db: /var/limitd/database
+
+#define the bucket types
+buckets:
+  user:
+    size: 5
+    per_second: 10
+```
+
+Start the server:
+```bash
+limitd --config-file /etc/limitd.config
+```
+
+You can find all configuration options [here](TODO: ADD LINK)
+
+> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
+
+### node.js client
+To instantiate the **limitd** client:
 
 ```javascript
 var LimitdClient = require('limitd').Client;
-var limitd = new LimitdClient('limitd://10.0.0.23:9231');
+var limitd = new LimitdClient('limitd://localhost:9001');
 ```
 
-Example with express throttling requests:
+Add a middleware to your express application to reply with [429 Too Many Requests](http://tools.ietf.org/html/rfc6585#section-4) in case the limit is reached:
 
 ```javascript
-app.use(function (req, res, next) {
-  limitd.wait('ip', req.ip, function (err) {
-    next();
-  });
-})
-```
-
-Example with express responding [429 Too Many Requests](http://tools.ietf.org/html/rfc6585#section-4):
-
-~~~javascript
 app.use(function (req, res, next) {
   limitd.take('user', req.username, function (err, resp) {
     if (err) return next(err);
@@ -41,43 +65,9 @@ app.use(function (req, res, next) {
     res.send('429');
   });
 })
-~~~
-
-## Server Configuration
-
-Install limitd server by running:
-
-```
-npm i -g limitd
 ```
 
-In order to run an instance of limitd you will need a configuration file like this:
-
-```yaml
-#port to listen
-port: 9001
-
-#path where the data will be stored
-db: /var/limitd/database
-
-#Define the types of buckets
-buckets:
-  ip:
-    size: 10
-    per_second: 5
-    override:
-      127.0.0.1:
-        size: 10000
-        per_second: 500
-  user:
-    size: 5
-```
-
-Create a daemon (upstart, systemd, initd, etc.) that runs the following command
-
-```bash
-limitd --config-file /etc/limitd.config > /var/log/limitd.log
-```
+The client API is documented [here](TODO: ADD LINK)
 
 ## Motivation
 
@@ -102,6 +92,46 @@ Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-b
 -  **TAKE**: remove one or more tokens from the bucket. The server will respond inmediately with `conformant` true/false depending if there are sufficient tokens.
 -  **WAIT**: remove one or more tokens from the bucket. If there are insufficient tokens in the bucket the server will not respond the request until there are enought tokens.
 -  **PUT**: fill the bucket with one or more tokens. The max amount of tokens depends on the size of the bucket. This is useful when the application need to reset a bucket that's not autofilled by limitd.
+
+## Client API
+
+### `LimitdClient(serverUri)`
+**Constructor**. Creates an instance of the `LimitdClient` passing the server's uri.
+
+**Parameters**
+* `serverUri: String` - A valid URI with "limitd" schema with the TCP address of the server. If no port is provided the default port is `9231`.
+
+### `LimitdClient(options)`
+**Constructor**. Creates an instance of the `LimitdClient` passing the server's uri.
+
+**Parameters**
+* `options?: Object` - An optional object whose properties are the client configuration settings.
+  * `host?: String` - The limitd server host name or IP address. If not provided `"localhost"` is used.
+  * `port?: Number` - The limitd server port number. If not provided `9231` is used.
+  
+### `client.connect(done)`
+Connects the client to the server.
+
+**Parameters**
+* `done?: () => any` - An optional function to be invoked when a connection is established. It receives no parameters.
+
+### `client.take(type, key, count, done)`
+Takes `count` tokens from the `key` bucket in of the `type` token type. Invokes the `done` callback if an error occurs, if there were not enough tokens in the bucket or if there were.
+
+**Parameters**
+
+* `type: String` - The bucket type.
+* `key: String` - The bucket key inside `type`.
+* `count?: Number` - An optional amount of tokens to take from the bucket. Defaults to `1` if not provided.
+* `done?: (err, response: TakeREsponse)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
+
+### `TakeResponse` class
+The `LimitdResponse` is a class with the following properties:
+
+* `conformant: Boolean`: `true` if there were enough tokens in the bucket, `false` otherwise.
+* `remaining: Number`: The amount of tokens remaining in the bucket after the operation.
+* `limit: Number`: The maximum amount of tokens available in the token.
+* `reset: Number`: A UNIX timestamp of the expected time at which the bucket will be full again (full means `remaining === limit`).
 
 ## About this module
 
