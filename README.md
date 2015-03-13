@@ -174,7 +174,7 @@ Removes `count` tokens from the `key` bucket in of the `type` token type. If the
 * `type: String` - The bucket type.
 * `key: String` - The bucket key inside `type`.
 * `count?: Number` - An optional amount of tokens to take from the bucket. Defaults to `1` if not provided.
-* `done?: (err, response: WaitResponse)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
+* `done?: (err, response: TakeResponse)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
 
 ### `client.wait(type, key, count, done)`
 Removes `count` tokens from the `key` bucket in of the `type` token type. If there were not enough tokens the response is delayed until there are.
@@ -217,7 +217,7 @@ The `TakeResponse` is a class with the following properties:
 
 * `conformant: Boolean`: `true` if there were enough tokens in the bucket, `false` otherwise.
 
-### class: `WaitResponse extends TakeResponse`
+### class: `WaitResponse extends Response`
 The `WaitResponse` is a class with the following properties:
 
 * `delayed: Boolean`: `true` if the request was delayed waiting for enough tokens, `false otherwise`.
