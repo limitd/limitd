@@ -7,36 +7,6 @@ In order to use **limitd** you need to setup the server and consume it from the 
 
 This example assumes that you want to implement rate limiting for an express application.
 
-### Server setup
-Install the **limitd** server:
-```
-npm i -g limitd
-```
-
-Create a file named `limitd.config` for the server settings:
-```yaml
-#port to listen on
-port: 9001
-
-#db path
-db: /var/limitd/database
-
-#define the bucket types
-buckets:
-  user:
-    size: 5
-    per_second: 10
-```
-
-Start the server:
-```bash
-limitd --config-file /etc/limitd.config
-```
-
-You can find all configuration options [below](#server_options).
-
-> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
-
 ### node.js client
 To instantiate the **limitd** client:
 
@@ -68,6 +38,36 @@ app.use(function (req, res, next) {
 ```
 
 The client API is documented [below](#client_api).
+
+### Server setup
+Install the **limitd** server:
+```
+npm i -g limitd
+```
+
+Create a file named `limitd.config` for the server settings:
+```yaml
+#port to listen on
+port: 9001
+
+#db path
+db: /var/limitd/database
+
+#define the bucket types
+buckets:
+  user:
+    size: 5
+    per_second: 10
+```
+
+Start the server:
+```bash
+limitd --config-file /etc/limitd.config
+```
+
+You can find all configuration options [below](#server_options).
+
+> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
 
 ## Motivation
 
