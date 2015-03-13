@@ -33,7 +33,7 @@ Start the server:
 limitd --config-file /etc/limitd.config
 ```
 
-You can find all configuration options [here](TODO: ADD LINK)
+You can find all configuration options [below](#server_options).
 
 > **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
 
@@ -92,6 +92,56 @@ Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-b
 -  **TAKE**: remove one or more tokens from the bucket. The server will reply immediately with `conformant` true/false depending if there are sufficient tokens.
 -  **WAIT**: remove one or more tokens from the bucket. If there aren't enough tokens in the bucket the server will not reply until there are.
 -  **PUT**: put one or more tokens into the bucket. The max amount of tokens depends on the bucket size. This is useful when the application needs to reset a bucket that's not autofilled by limitd.
+
+<a name="server_options"></a>
+## Server options
+The server configuration file uses [YAML](http://www.yaml.org/).
+
+### `port`
+* Type: `Number`
+* Description: Specifies the port to use to run the server. If not provided the default is `9231`.
+
+### `db`
+* Type: `Number`
+* Description: Specifies the path for the server database. This is a mandatory parameter.
+
+### `buckets`
+
+### `buckets.{type}`
+
+* Type: `Object`
+* Description: Specifies the configuration for a bucket type.
+
+### `buckets.{type}.size`
+
+* Type: `Number`
+* Description: Specifies the size of the bucket. Defaults to 0.
+
+### `buckets.{type}.per_{interval}`
+
+* Type: `Number`
+* Values: `per_second`, `per_minute`, `per_hour`, `per_day`. 
+* Description: Specifies the amount of tokens to add to the bucket per interval.
+* Notes: Only specify one interval.
+
+### `buckets.{type}.override`
+
+### `buckets.{type}.override.{key}`
+
+* Type: `Object`
+* Description: Specifies custom configuration for a bucket with the specified `key` for the particular `type`.
+
+### `buckets.{type}.override.{key}.size`
+
+* Type: `Number`
+* Description: Specifies the size of the bucket. Defaults to 0.
+
+### `buckets.{type}.override.{key}.per_{interval}`
+
+* Type: `Number`
+* Values: `per_second`, `per_minute`, `per_hour`, `per_day`. 
+* Description: Specifies the amount of tokens to add to the bucket per interval.
+* Notes: Only specify one interval.
 
 <a name="client_api"></a>
 ## Client API
