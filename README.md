@@ -67,7 +67,7 @@ app.use(function (req, res, next) {
 })
 ```
 
-The client API is documented [here](TODO: ADD LINK)
+The client API is documented [below](#client_api).
 
 ## Motivation
 
@@ -89,10 +89,11 @@ Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-b
 
 ## Server operations
 
--  **TAKE**: remove one or more tokens from the bucket. The server will respond inmediately with `conformant` true/false depending if there are sufficient tokens.
--  **WAIT**: remove one or more tokens from the bucket. If there are insufficient tokens in the bucket the server will not respond the request until there are enought tokens.
--  **PUT**: fill the bucket with one or more tokens. The max amount of tokens depends on the size of the bucket. This is useful when the application need to reset a bucket that's not autofilled by limitd.
+-  **TAKE**: remove one or more tokens from the bucket. The server will reply immediately with `conformant` true/false depending if there are sufficient tokens.
+-  **WAIT**: remove one or more tokens from the bucket. If there aren't enough tokens in the bucket the server will not reply until there are.
+-  **PUT**: put one or more tokens into the bucket. The max amount of tokens depends on the bucket size. This is useful when the application needs to reset a bucket that's not autofilled by limitd.
 
+<a name="client_api"></a>
 ## Client API
 
 ### `LimitdClient(serverUri)`
@@ -116,22 +117,60 @@ Connects the client to the server.
 * `done?: () => any` - An optional function to be invoked when a connection is established. It receives no parameters.
 
 ### `client.take(type, key, count, done)`
-Takes `count` tokens from the `key` bucket in of the `type` token type. Invokes the `done` callback if an error occurs, if there were not enough tokens in the bucket or if there were.
+Removes `count` tokens from the `key` bucket in of the `type` token type. If there weren't enough tokens then `response.conformant` will be `false`, `true` otherwise.
 
 **Parameters**
 
 * `type: String` - The bucket type.
 * `key: String` - The bucket key inside `type`.
 * `count?: Number` - An optional amount of tokens to take from the bucket. Defaults to `1` if not provided.
-* `done?: (err, response: TakeREsponse)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
+* `done?: (err, response: WaitResponse)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
 
-### `TakeResponse` class
-The `LimitdResponse` is a class with the following properties:
+### `client.wait(type, key, count, done)`
+Removes `count` tokens from the `key` bucket in of the `type` token type. If there were not enough tokens the response is delayed until there are.
 
-* `conformant: Boolean`: `true` if there were enough tokens in the bucket, `false` otherwise.
+**Parameters**
+
+* `type: String` - The bucket type.
+* `key: String` - The bucket key inside `type`.
+* `count?: Number` - An optional amount of tokens to take from the bucket. Defaults to `1` if not provided.
+* `done?: (err, response: WaitResponse)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
+
+### `client.reset(type, key, done)`
+Fills the `key` bucket of the `type` bucket type.
+
+**Parameters**
+
+* `type: String` - The bucket type.
+* `key: String` - The bucket key inside `type`.
+* `done?: (err, response: Response)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
+
+### `client.put(type, key, count, done)`
+Put `count` tokens in the `key` bucket of the `type` bucket type.
+
+**Parameters**
+
+* `type: String` - The bucket type.
+* `key: String` - The bucket key inside `type`.
+* `count?: Number` - An optional amount of tokens to put in the bucket. If not provided it is the same as invoking `client.reset(type, key, done)`.
+* `done?: (err, response: Response)` - An optional callback. If an error occurs it will be in `err`. Otherwise, the result will be in `response`.
+
+### class: `Response`
+The `TakeResponse` is a class with the following properties:
+
 * `remaining: Number`: The amount of tokens remaining in the bucket after the operation.
 * `limit: Number`: The maximum amount of tokens available in the token.
 * `reset: Number`: A UNIX timestamp of the expected time at which the bucket will be full again (full means `remaining === limit`).
+
+### class: `TakeResponse extends Response`
+The `TakeResponse` is a class with the following properties:
+
+* `conformant: Boolean`: `true` if there were enough tokens in the bucket, `false` otherwise.
+
+### class: `WaitResponse extends TakeResponse`
+The `WaitResponse` is a class with the following properties:
+
+* `delayed: Boolean`: `true` if the request was delayed waiting for enough tokens, `false otherwise`.
 
 ## About this module
 
