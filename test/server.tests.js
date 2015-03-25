@@ -51,7 +51,6 @@ describe('limitd server', function () {
       });
     });
 
-
     it('should work with a fixed bucket', function (done) {
       async.map(_.range(0, 3), function (i, cb) {
         client.take('wrong_password', 'tito', cb);
@@ -110,7 +109,19 @@ describe('limitd server', function () {
         assert.equal(lastResponse.limit, 10);
         done();
       });
+    });
 
+    it('should set reset to UNIX timestamp regardless of period', function(done){
+      var now = 1425920267;
+      Date.fix(now);
+      client.take('ip', '10.0.0.1', function (err, response) {
+        if (err) { return done(err); }
+        assert.ok(response.conformant);
+        assert.equal(response.remaining, 0);
+        assert.equal(response.reset, now + 1800);
+        assert.equal(response.limit, 1);
+        done();
+      });
     });
   });
 
