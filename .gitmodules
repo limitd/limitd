@@ -1,3 +1,0 @@
-[submodule "protocol"]
-	path = protocol
-	url = git@github.com:limitd/protocol.git
