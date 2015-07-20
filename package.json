@@ -16,7 +16,7 @@
   },
   "author": "José F. Romaniello <jfromaniello@gmail.com> (http://joseoncode.com)",
   "license": "MIT",
-  "engine": {
+  "engines": {
     "node": ">=0.10.40 <0.12"
   },
   "dependencies": {
