@@ -60,6 +60,17 @@ LimitdServer.prototype._handler = function (socket) {
   var sockets_details = _.pick(socket, ['remoteAddress', 'remotePort']);
   var log = this._logger;
 
+  socket.on('error', function (err) {
+    log.debug(_.extend(sockets_details, {
+      err: {
+        code:    err.code,
+        message: err.message
+      }
+    }), 'connection error');
+  }).on('close', function () {
+    log.debug(sockets_details, 'connection closed');
+  });
+
   log.debug(sockets_details, 'connection accepted');
 
   var decoder = RequestDecoder();
