@@ -53,29 +53,7 @@ LimitdClient.prototype.connect = function (done) {
   }).connect(options.port, options.address || options.hostname || options.host);
 };
 
-LimitdClient.prototype._request = function (method, type, key, count, done) {
-  if (typeof count === 'function') {
-    done = count;
-    count = method == 'PUT' ? 'all' : 1;
-  }
-
-  if (typeof count === 'undefined') {
-    count = method == 'PUT' ? 'all' : 1;
-  }
-
-  var request = new RequestMessage({
-    'id':     randomstring.generate(7),
-    'type':  type,
-    'key':    key,
-    'method': RequestMessage.Method[method],
-  });
-
-  if (count === 'all') {
-    request.set('all', true);
-  } else {
-    request.set('count', count);
-  }
-
+LimitdClient.prototype._request = function (request, type, done) {
   if (!this.stream || !this.stream.writable) {
     var err = new Error('The socket is closed.');
     if (done) {
@@ -96,21 +74,72 @@ LimitdClient.prototype._request = function (method, type, key, count, done) {
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_TYPE) {
       return done(new Error(type + ' is not a valid bucket type'));
     }
-    done(null, response['.limitd.TakeResponse.response'] || response['.limitd.PutResponse.response']);
+    done(null, response['.limitd.TakeResponse.response'] || response['.limitd.PutResponse.response'] || response['.limitd.StatusResponse.response']);
   });
 };
 
+LimitdClient.prototype._takeOrWait = function (method, type, key, count, done) {
+  if (typeof count === 'function' || typeof done === 'undefined') {
+    done = count;
+    count = 1;
+  }
+
+  var request = new RequestMessage({
+    'id':     randomstring.generate(7),
+    'type':   type,
+    'key':    key,
+    'method': RequestMessage.Method[method],
+  });
+
+  if (count === 'all') {
+    request.set('all', true);
+  } else {
+    request.set('count', count);
+  }
+
+  return this._request(request, type, done);
+};
+
 LimitdClient.prototype.take = function (type, key, count, done) {
-  return this._request('TAKE', type, key, count, done);
+  return this._takeOrWait('TAKE', type, key, count, done);
+};
+
+LimitdClient.prototype.wait = function (type, key, count, done) {
+  return this._takeOrWait('WAIT', type, key, count, done);
 };
 
 LimitdClient.prototype.reset =
 LimitdClient.prototype.put = function (type, key, count, done) {
-  return this._request('PUT', type, key, count, done);
+  if (typeof count === 'function') {
+    done = count;
+    count = 'all';
+  }
+
+  var request = new RequestMessage({
+    'id':     randomstring.generate(7),
+    'type':   type,
+    'key':    key,
+    'method': RequestMessage.Method.PUT,
+  });
+
+  if (count === 'all') {
+    request.set('all', true);
+  } else {
+    request.set('count', count);
+  }
+
+  return this._request(request, type, done);
 };
 
-LimitdClient.prototype.wait = function (type, key, count, done) {
-  return this._request('WAIT', type, key, count, done);
+LimitdClient.prototype.status = function (type, key, done) {
+  var request = new RequestMessage({
+    'id':     randomstring.generate(7),
+    'type':   type,
+    'key':    key,
+    'method': RequestMessage.Method.STATUS,
+  });
+
+  return this._request(request, type, done);
 };
 
 module.exports = LimitdClient;
