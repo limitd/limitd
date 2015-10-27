@@ -230,4 +230,44 @@ describe('limitd server', function () {
 
   });
 
+  describe('STATUS', function () {
+
+    it('should work', function (done) {
+      var ip = '211.11.84.12';
+
+      client.take('ip', ip, function (err) {
+        if (err) return done(err);
+        client.status('ip', ip, function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.items[0].remaining, 9);
+          done();
+        });
+      });
+    });
+
+    it('should work with subclasses', function (done) {
+
+      async.series([
+        function (cb) { client.take('ip', 'class1|192.123.21.1', cb); },
+        function (cb) { client.take('ip', 'class1|192.123.21.2', cb); },
+        function (cb) { client.take('ip', 'class1|192.123.21.2', cb); },
+        function (cb) { client.take('ip', 'class2|192.123.21.3', cb); },
+      ], function (err) {
+        if (err) return done(err);
+        //this will retrieve all bucket instances of ip - class1
+        client.status('ip', 'class1', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.items.length, 2);
+          assert.equal(response.items[0].remaining, 9);
+          assert.equal(response.items[0].instance, 'class1|192.123.21.1');
+          assert.equal(response.items[1].remaining, 8);
+          assert.equal(response.items[1].instance, 'class1|192.123.21.2');
+          done();
+        });
+      });
+
+    });
+
+  });
+
 });
