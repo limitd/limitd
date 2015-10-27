@@ -50,7 +50,7 @@ function LimitdServer (options) {
     self.emit('error', err);
   });
 
-  this._db = db(this._config.db);
+  this._db = db(this._config, this._logger);
   this._buckets = new Buckets(this._db, this._config);
 }
 

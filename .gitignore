@@ -30,3 +30,5 @@ build/Release
 node_modules
 
 .DS_Store
+
+test/dbs

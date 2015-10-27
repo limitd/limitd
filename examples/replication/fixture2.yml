@@ -1,0 +1,16 @@
+port: 9002
+
+replication_port: 19002
+
+instance_id: node2
+
+peers:
+  - 0.0.0.0:19001
+
+db: /tmp/limitd2
+
+log_level: info
+
+buckets:
+  ip:
+    per_hour: 5
