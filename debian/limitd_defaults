@@ -1,0 +1,11 @@
+
+#Modify which default nodejs/iojs installation should use
+NODE_PATH=/opt/node-v0.10.40-linux-x64/bin
+
+# Installation dir
+export DIR=/opt/limitd
+
+# Limitd config file path
+export CONF_FILE=/etc/limitd.conf
+
+export PATH=$NODE_PATH:$PATH
