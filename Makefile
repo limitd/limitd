@@ -19,6 +19,7 @@ build_deb: check-fpm-installed check-version-variable check-deb-variables
 	--before-remove debian/pre_rm.sh \
 	--prefix /opt --deb-upstart debian/limitd --deb-default debian/limitd_defaults \
 	--url ' $(GIT_URL)' --version $(VERSION_NUMBER) -n limitd \
+	-d 'nodejs' -d 'nodejs-legacy' \
 	-x '**/.git*' -x '*.tgz' -x '**/test/*' \
 	--description 'Jenkins build $(VERSION_NUMBER) - git commit $(GIT_BRANCH)-$(GIT_COMMIT)' \
 	-t deb -s dir limitd 
