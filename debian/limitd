@@ -31,7 +31,7 @@ script
     --pidfile /var/run/$UPSTART_JOB.pid \
     --chuid limitd \
     --start \
-    --exec $NODE_PATH/node $DIR/limitd -- --config-file $CONF_FILE >> /var/log/limitd.log 2>&1
+    --exec $NODE_PATH/node $DIR/bin/limitd -- --config-file $CONF_FILE >> /var/log/limitd.log 2>&1
 end script
 
 post-start script
