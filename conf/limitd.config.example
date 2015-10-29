@@ -1,0 +1,11 @@
+#port to listen on
+port: 9001
+
+#db path
+db: /var/limitd/database
+
+#define the bucket types
+buckets:
+  user:
+    size: 5
+    per_second: 10
