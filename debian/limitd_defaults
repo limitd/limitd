@@ -1,6 +1,6 @@
 
 #Modify which default nodejs/iojs installation should use
-NODE_PATH=/opt/node-v0.10.40-linux-x64/bin
+NODE_PATH=/usr/bin
 
 # Installation dir
 export DIR=/opt/limitd
