@@ -3,7 +3,7 @@
 # Postinst script for limitd package
 
 NAME="limitd"
-file_default="/etc/default/$NAME_defaults"
+file_default="/etc/default/${NAME}_defaults"
 file_init="/etc/init/$NAME.conf"
 
 if [ -e $file_default ]; then newhash_file_default=$(md5sum < $file_default); fi
@@ -37,6 +37,7 @@ cp /opt/$NAME/debian/$NAME-logs /etc/logrotate.d/
 
 # Create database dir and deploy example config file
 mkdir -p /var/limitd/database
+chown -R $NAME:$NAME /var/limitd
 if [ ! -s /etc/limitd.conf ]
 then
 	cp /opt/$NAME/conf/limitd.conf.example /etc/limitd.conf
