@@ -25,6 +25,7 @@
     "commander": "~2.6.0",
     "debug": "~2.1.1",
     "event-stream": "~3.2.2",
+    "ioredis": "~1.10.0",
     "js-yaml": "~3.2.5",
     "level": "~0.18.0",
     "level-serial": "~1.0.0",
@@ -37,6 +38,7 @@
     "protobufjs": "~3.8.2",
     "randomstring": "~1.0.3",
     "reconnect-net": "0.0.0",
+    "redlock": "~1.0.0",
     "through": "~2.3.6"
   },
   "devDependencies": {

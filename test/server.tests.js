@@ -6,21 +6,51 @@ var expect = require('chai').expect;
 var rimraf = require('rimraf');
 var path   = require('path');
 var client;
-
 var async = require('async');
 var _ = require('lodash');
+var Redis = require('ioredis');
 
 describe('limitd server', function () {
-  var server;
-
-  before(function (done) {
+  describe('on leveldb', function () {
     var db_file = path.join(__dirname, 'dbs', 'server.tests.db');
 
     try{
       rimraf.sync(db_file);
     } catch(err){}
 
-    server = new LimitdServer(_.extend({db: db_file}, require('./fixture')));
+    run_tests({db: db_file});
+  });
+
+  describe('on redis', function () {
+    var redis_options = {
+      backend: 'redis',
+      host: '127.0.0.1',
+      keyPrefix: 'limitd-tests:'
+    };
+
+    before(function (done) {
+      var redis = new Redis(redis_options);
+
+      redis.keys('limitd*', function (err, keys) {
+        keys.forEach(function (key) {
+          redis.del(key.replace(redis_options.keyPrefix, ''));
+        });
+      });
+
+      setTimeout(done, 100);
+    });
+
+
+    run_tests({ db: redis_options });
+  });
+});
+
+
+function run_tests (db_options) {
+  var server;
+
+  before(function (done) {
+    server = new LimitdServer(_.extend(db_options, require('./fixture')));
 
     server.start(function (err, address) {
       if (err) return done(err);
@@ -149,7 +179,6 @@ describe('limitd server', function () {
         var waitingSince = Date.now();
         client.wait('ip', '211.76.23.5', 3, function (err, response) {
           var waited = Date.now() - waitingSince;
-          console.log('waited', waited);
           assert.ok(response.conformant);
           assert.ok(response.delayed);
           expect(waited).to.be.closeTo(600, 10);
@@ -270,4 +299,4 @@ describe('limitd server', function () {
 
   });
 
-});
+};
