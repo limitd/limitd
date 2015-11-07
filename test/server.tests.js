@@ -170,7 +170,7 @@ describe('limitd server', function () {
     client.take('ip', '211.45.66.1', function (err) {
       if (err) return done(err);
       setTimeout(function () {
-        server._db.get('ÿipÿ211.45.66.1', function (err, result) {
+        server._db.create('ip').get('211.45.66.1', function (err, result) {
           assert.isUndefined(result);
           done();
         });
