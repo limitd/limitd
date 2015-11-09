@@ -43,6 +43,33 @@ describe('limitd server', function () {
 
     run_tests({ db: redis_options });
   });
+
+  describe.skip('on redis cluster', function () {
+    var redis_options = {
+      backend: 'redis',
+      keyPrefix: 'limitd-tests:',
+      nodes: [
+        {
+          host: '127.0.0.1'
+        }
+      ]
+    };
+
+    before(function (done) {
+      var redis = new Redis(redis_options);
+
+      redis.keys('limitd*', function (err, keys) {
+        keys.forEach(function (key) {
+          redis.del(key.replace(redis_options.keyPrefix, ''));
+        });
+      });
+
+      setTimeout(done, 100);
+    });
+
+
+    run_tests({ db: redis_options });
+  });
 });
 
 
