@@ -301,7 +301,7 @@ function run_tests (db_options) {
       });
     });
 
-    it('should work with subclasses', function (done) {
+    it.skip('should work with subclasses', function (done) {
 
       async.parallel([
         function (cb) { client.take('ip', 'class1|192.123.21.1', cb); },
