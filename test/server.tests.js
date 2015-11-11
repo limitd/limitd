@@ -303,7 +303,7 @@ function run_tests (db_options) {
 
     it('should work with subclasses', function (done) {
 
-      async.series([
+      async.parallel([
         function (cb) { client.take('ip', 'class1|192.123.21.1', cb); },
         function (cb) { client.take('ip', 'class1|192.123.21.2', cb); },
         function (cb) { client.take('ip', 'class1|192.123.21.2', cb); },
