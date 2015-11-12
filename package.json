@@ -11,8 +11,7 @@
     "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --require ./test/util/fakeDate.js"
   },
   "bin": {
-    "limitd": "./bin/limitd",
-    "limitdctl": "./bin/limitdctl"
+    "limitd": "./bin/limitd"
   },
   "author": "José F. Romaniello <jfromaniello@gmail.com> (http://joseoncode.com)",
   "license": "MIT",

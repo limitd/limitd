@@ -11,7 +11,7 @@ This example assumes that you want to implement rate limiting for an express app
 To instantiate the **limitd** client:
 
 ```javascript
-var LimitdClient = require('limitd').Client;
+var LimitdClient = require('limitd-client');
 var limitd = new LimitdClient('limitd://localhost:9001');
 ```
 
@@ -120,7 +120,7 @@ The server configuration file uses [YAML](http://www.yaml.org/).
 ### `buckets.{type}.per_{interval}`
 
 * Type: `Number`
-* Values: `per_second`, `per_minute`, `per_hour`, `per_day`. 
+* Values: `per_second`, `per_minute`, `per_hour`, `per_day`.
 * Description: Specifies the amount of tokens to add to the bucket per interval.
 * Notes: Only specify one interval.
 
@@ -139,7 +139,7 @@ The server configuration file uses [YAML](http://www.yaml.org/).
 ### `buckets.{type}.override.{key}.per_{interval}`
 
 * Type: `Number`
-* Values: `per_second`, `per_minute`, `per_hour`, `per_day`. 
+* Values: `per_second`, `per_minute`, `per_hour`, `per_day`.
 * Description: Specifies the amount of tokens to add to the bucket per interval.
 * Notes: Only specify one interval.
 
@@ -159,7 +159,7 @@ The server configuration file uses [YAML](http://www.yaml.org/).
 * `options?: Object` - An optional object whose properties are the client configuration settings.
   * `host?: String` - The limitd server host name or IP address. If not provided `"localhost"` is used.
   * `port?: Number` - The limitd server port number. If not provided `9231` is used.
-  
+
 ### `client.connect(done)`
 Connects the client to the server.
 
@@ -222,13 +222,13 @@ The `WaitResponse` is a class with the following properties:
 
 * `delayed: Boolean`: `true` if the request was delayed waiting for enough tokens, `false otherwise`.
 
-## About this module
+## Friends
 
 limitd is a node.js module that works as:
 
--  **limitd** server implementation (install with `-g`).
--  **limitdctl** is a command line utility (install with `-g`).
--  node.js client library for limitd  (install with local).
+-  **limitd** server implementation: this repository.
+-  **limitdctl** is a command line utility: https://github.com/limitd/limitdctl
+-  node.js client library for limitd: https://github.com/limitd/node-client
 
 ## License
 
