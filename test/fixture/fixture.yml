@@ -11,5 +11,10 @@ buckets:
       10.0.0.1:
         size: 1
         per_hour: 2
+      custom:
+        size: 1000
+        per_second: 500
+        match: !!js/regexp /^127\./ig
+
   wrong_password:
     size: 3

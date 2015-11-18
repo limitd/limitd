@@ -20,8 +20,8 @@ var config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
 
 if (config.configFile) {
   try {
-    config_file = path.resolve(process.cwd(), config.configFile);
-    var doc = yaml.safeLoad(fs.readFileSync(config_file, 'utf8'));
+    var config_file = path.resolve(process.cwd(), config.configFile);
+    var doc = yaml.load(fs.readFileSync(config_file, 'utf8'));
     _.extend(config, doc);
   } catch (e) {
     console.error('Error loading configuration \n', e.stack);

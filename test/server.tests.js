@@ -44,32 +44,32 @@ describe('limitd server', function () {
     run_tests({ db: redis_options });
   });
 
-  describe.skip('on redis cluster', function () {
-    var redis_options = {
-      backend: 'redis',
-      keyPrefix: 'limitd-tests:',
-      nodes: [
-        {
-          host: '127.0.0.1'
-        }
-      ]
-    };
+  // describe.skip('on redis cluster', function () {
+  //   var redis_options = {
+  //     backend: 'redis',
+  //     keyPrefix: 'limitd-tests:',
+  //     nodes: [
+  //       {
+  //         host: '127.0.0.1'
+  //       }
+  //     ]
+  //   };
 
-    before(function (done) {
-      var redis = new Redis(redis_options);
+  //   before(function (done) {
+  //     var redis = new Redis(redis_options);
 
-      redis.keys('limitd*', function (err, keys) {
-        keys.forEach(function (key) {
-          redis.del(key.replace(redis_options.keyPrefix, ''));
-        });
-      });
+  //     redis.keys('limitd*', function (err, keys) {
+  //       keys.forEach(function (key) {
+  //         redis.del(key.replace(redis_options.keyPrefix, ''));
+  //       });
+  //     });
 
-      setTimeout(done, 100);
-    });
+  //     setTimeout(done, 100);
+  //   });
 
 
-    run_tests({ db: redis_options });
-  });
+  //   run_tests({ db: redis_options });
+  // });
 });
 
 
@@ -141,6 +141,18 @@ function run_tests (db_options) {
       }, function (err) {
         if (err) return done(err);
         client.take('ip', '127.0.0.1', function (err, response) {
+          assert.ok(response.conformant);
+          done();
+        });
+      });
+    });
+
+    it('should be conformant if an override with regex allows it', function (done) {
+      async.each(_.range(0, 10), function (i, cb) {
+        client.take('ip', '127.4.4.4', cb);
+      }, function (err) {
+        if (err) return done(err);
+        client.take('ip', '127.4.4.4', function (err, response) {
           assert.ok(response.conformant);
           done();
         });
