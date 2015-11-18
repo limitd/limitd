@@ -159,6 +159,18 @@ function run_tests (db_options) {
       });
     });
 
+    it('can expire an override', function (done) {
+      async.each(_.range(0, 10), function (i, cb) {
+        client.take('ip', '10.0.0.123', cb);
+      }, function (err) {
+        if (err) return done(err);
+        client.take('ip', '10.0.0.123', function (err, response) {
+          assert.notOk(response.conformant);
+          done();
+        });
+      });
+    });
+
     it('should use seconds ceiling for next reset', function (done) {
       // it takes ~1790 msec to fill the bucket with this test
       var now = 1425920267;

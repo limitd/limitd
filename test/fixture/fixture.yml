@@ -8,13 +8,21 @@ buckets:
       127.0.0.1:
         size: 1000
         per_second: 500
+
       10.0.0.1:
         size: 1
         per_hour: 2
-      custom:
+
+      with regexp:
         size: 1000
         per_second: 500
         match: !!js/regexp /^127\./ig
+
+      with regexp2:
+        size: 1000
+        per_second: 500
+        until: !!timestamp 2010-11-18
+        match: !!js/regexp /^10\./ig
 
   wrong_password:
     size: 3
