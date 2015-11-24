@@ -1,5 +1,7 @@
 port: 9001
 
+log_level: error
+
 buckets:
   ip:
     size: 10

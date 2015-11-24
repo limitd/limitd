@@ -325,6 +325,14 @@ function run_tests (db_options) {
       });
     });
 
+    it('should not fail if bucket doesnt exists', function (done) {
+      client.status('ip', '12312312321312321', function (err, response) {
+        if (err) return done(err);
+        assert.equal(response.items.length, 0);
+        done();
+      });
+    });
+
     it.skip('should work with subclasses', function (done) {
 
       async.parallel([
