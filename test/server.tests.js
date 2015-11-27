@@ -124,10 +124,11 @@ function run_tests (db_options) {
     });
 
     it('should return false when traffic is not conformant', function (done) {
-      async.each(_.range(0, 10), function (i, cb) {
+      async.map(_.range(0, 10), function (i, cb) {
         client.take('ip', '211.123.12.24', cb);
-      }, function (err) {
+      }, function (err, responses) {
         if (err) return done(err);
+        assert.ok(responses.every(function (r) { return r.conformant; }));
         client.take('ip', '211.123.12.24', function (err, response) {
           assert.notOk(response.conformant);
           done();
@@ -183,7 +184,6 @@ function run_tests (db_options) {
       async.series(requests, function (err, results) {
         if (err) return done(err);
         var lastResponse = results[results.length -1];
-        if (err) return done(err);
         assert.ok(lastResponse.conformant);
         assert.equal(lastResponse.remaining, 1);
         assert.equal(lastResponse.reset, now + 2);
@@ -308,6 +308,16 @@ function run_tests (db_options) {
       });
     });
 
+    it('should work for a fixed bucket', function (done) {
+      client.take('wrong_password', 'calocalaccc', function (err, response) {
+        assert.ok(response.conformant);
+        client.reset('wrong_password', 'calocalaccc', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.remaining, 3);
+          done();
+        });
+      });
+    });
   });
 
   describe('STATUS', function () {
@@ -358,4 +368,4 @@ function run_tests (db_options) {
 
   });
 
-};
+}
