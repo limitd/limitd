@@ -63,6 +63,6 @@ redis.call('HMSET', KEYS[1],
             'content', new_content)
 
 --expire the bucket when it should be full
--- redis.call('PEXPIRE', KEYS[1], math.ceil(bucket_size / tokens_per_ms))
+redis.call('PEXPIRE', KEYS[1], math.ceil(bucket_size / tokens_per_ms))
 
 return { current_timestamp_ms, new_content, enough_tokens }
