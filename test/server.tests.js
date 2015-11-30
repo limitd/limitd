@@ -335,6 +335,17 @@ function run_tests (db_options) {
       });
     });
 
+    it('should work for fixed buckets', function (done) {
+      client.take('wrong_password', 'curichiaga', function (err) {
+        if (err) return done(err);
+        client.status('wrong_password', 'curichiaga', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.items[0].remaining, 2);
+          done();
+        });
+      });
+    });
+
     it('should not fail if bucket doesnt exists', function (done) {
       client.status('ip', '12312312321312321', function (err, response) {
         if (err) return done(err);
