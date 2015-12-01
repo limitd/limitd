@@ -39,8 +39,19 @@ app.use(function (req, res, next) {
 
 The client API is documented [below](#client_api).
 
+
 ### Server setup
-Install the **limitd** server:
+
+Install on debian with
+
+```
+sudo sh -c 'echo deb http://debs.auth0.com/ stable main > /etc/apt/sources.list.d/auth0.list'
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv F63E3D3A
+sudo aptitude update
+sudo aptitude install -y limitd
+```
+
+On other systems use node.js and npm:
 ```
 npm i -g limitd
 ```
