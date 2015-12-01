@@ -12,6 +12,9 @@ var _                = require('lodash');
 var DEFAULT_PORT = 9231;
 var DEFAULT_HOST = 'localhost';
 
+//This client is deprecate use:
+//    npm install limitd-client --save
+
 function LimitdClient (options) {
   options = options || {};
   EventEmitter.call(this);
