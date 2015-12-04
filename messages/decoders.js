@@ -1,6 +1,4 @@
 var messages = require('./.');
-var through    = require('through');
-var ByteBuffer = require('protobufjs').ByteBuffer;
 var decoder = require('pb-stream').decoder;
 
 function buildDecoder(Message) {
