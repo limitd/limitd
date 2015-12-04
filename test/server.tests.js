@@ -320,6 +320,17 @@ function run_tests (db_options) {
     });
   });
 
+  describe('ping', function () {
+
+    it('should work', function (done) {
+      client.ping(function (err) {
+        if (err) return done(err);
+        done();
+      });
+    });
+
+  });
+
   describe('STATUS', function () {
 
     it('should work', function (done) {

@@ -77,7 +77,10 @@ LimitdClient.prototype._request = function (request, type, done) {
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_TYPE) {
       return done(new Error(type + ' is not a valid bucket type'));
     }
-    done(null, response['.limitd.TakeResponse.response'] || response['.limitd.PutResponse.response'] || response['.limitd.StatusResponse.response']);
+    done(null, response['.limitd.TakeResponse.response']   ||
+               response['.limitd.PutResponse.response']    ||
+               response['.limitd.StatusResponse.response'] ||
+               response['.limitd.PongResponse.response']);
   });
 };
 
@@ -143,6 +146,17 @@ LimitdClient.prototype.status = function (type, key, done) {
   });
 
   return this._request(request, type, done);
+};
+
+LimitdClient.prototype.ping = function (done) {
+  var request = new RequestMessage({
+    'id':     randomstring.generate(7),
+    'type':   '',
+    'key':    '',
+    'method': RequestMessage.Method.PING,
+  });
+
+  return this._request(request, '', done);
 };
 
 module.exports = LimitdClient;
