@@ -26,6 +26,7 @@
     "event-stream": "~3.2.2",
     "ioredis": "~1.10.0",
     "js-yaml": "~3.2.5",
+    "length-prefixed-stream": "~1.4.0",
     "level": "^1.4.0",
     "level-serial": "~1.0.0",
     "level-spaces": "~1.1.1",

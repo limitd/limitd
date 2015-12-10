@@ -1,8 +1,16 @@
 var messages = require('./.');
-var decoder = require('pb-stream').decoder;
+var through2 = require('through2');
 
 function buildDecoder(Message) {
-  return decoder(Message);
+  return through2.obj(function (chunk, enc, callback) {
+    var decoded;
+    try {
+      decoded = Message.decode(chunk);
+      callback(null, decoded);
+    } catch(err) {
+      callback(err);
+    }
+  });
 }
 
 Object.keys(messages).forEach(function (k) {

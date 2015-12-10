@@ -8,6 +8,7 @@ var ErrorResponse  = require('./messages').ErrorResponse;
 var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
 var url              = require('url');
 var _                = require('lodash');
+var lps              = require('length-prefixed-stream');
 
 var DEFAULT_PORT = 9231;
 var DEFAULT_HOST = 'localhost';
@@ -37,10 +38,12 @@ LimitdClient.prototype.connect = function (done) {
 
   this.socket = reconnect(function (stream) {
 
-    stream.pipe(ResponseDecoder()).on('data', function (response) {
-      client.emit('response', response);
-      client.emit('response_' + response.request_id, response);
-    });
+    stream
+      .pipe(lps.decode())
+      .pipe(ResponseDecoder()).on('data', function (response) {
+        client.emit('response', response);
+        client.emit('response_' + response.request_id, response);
+      });
 
     client.stream = stream;
     client.emit('ready');
