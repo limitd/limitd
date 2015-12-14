@@ -3,7 +3,7 @@ var LimitdServer = require('..').Server;
 var Socket = require('net').Socket;
 var rimraf = require('rimraf');
 var _ = require('lodash');
-var path = require('path')
+var path = require('path');
 
 describe('wrong requests', function () {
   var server, address;
@@ -34,8 +34,7 @@ describe('wrong requests', function () {
     socket.connect(address.port, address.address)
       .once('connect', function () {
         socket.write(new ResponseMessage({
-          request_id: '123',
-          type: ResponseMessage.Type.TAKE
+          request_id: '123'
         }).encodeDelimited().toBuffer());
       }).once('close', function () {
         done();

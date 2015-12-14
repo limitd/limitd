@@ -76,7 +76,7 @@ LimitdClient.prototype._request = function (request, type, done) {
   if (!done) return;
 
   this.once('response_' + request.id, function (response) {
-    if (response.type === ResponseMessage.Type.ERROR &&
+    if (response['.limitd.ErrorResponse.response'] &&
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_TYPE) {
       return done(new Error(type + ' is not a valid bucket type'));
     }
