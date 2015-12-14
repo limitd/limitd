@@ -4,7 +4,7 @@ var randomstring     = require('randomstring');
 var reconnect        = require('reconnect-net');
 var RequestMessage   = require('./messages').Request;
 var ResponseMessage  = require('./messages').Response;
-var ErrorResponse  = require('./messages').ErrorResponse;
+var ErrorResponse    = require('./messages').ErrorResponse;
 var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
 var url              = require('url');
 var _                = require('lodash');
@@ -71,7 +71,7 @@ LimitdClient.prototype._request = function (request, type, done) {
     }
   }
 
-  this.stream.write(request.encodeDelimited().toBuffer());
+  this.stream.write(request.encodeDelimited(null, true).toBuffer());
 
   if (!done) return;
 
