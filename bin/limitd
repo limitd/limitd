@@ -13,6 +13,7 @@ program.version(require('../package').version)
   .option('-p --port [9231]', 'Port to bind [9231].', '9231')
   .option('-h --hostname [0.0.0.0]', 'Hostname to bind [0.0.0.0].', '0.0.0.0')
   .option('-c --config-file <file>', 'Configuration file.')
+  .option('--profile')
   .parse(process.argv);
 
 
@@ -32,12 +33,29 @@ var server = new LimitdServer(config);
 
 server.start();
 
-process.on('SIGTERM', function () {
+if (program.profile) {
+  var profiler = require('v8-profiler');
+  profiler.startProfiling('1', true);
+}
+
+function finish () {
+  if (program.profile) {
+    var profile1 = profiler.stopProfiling();
+    return profile1.export(function(error, result) {
+      fs.writeFileSync(process.cwd() + '/profile.cpuprofile', result);
+      profile1.delete();
+      process.exit(0);
+    });
+  }
   server.stop(function () {
     process.exit(0);
   });
   setTimeout(function () {
     process.exit(0);
   });
-});
+}
+
+process
+  .on('SIGTERM', finish)
+  .on('SIGINT', finish);
 
