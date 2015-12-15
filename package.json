@@ -26,6 +26,7 @@
     "event-stream": "~3.2.2",
     "ioredis": "~1.10.0",
     "js-yaml": "~3.2.5",
+    "length-prefixed-stream": "~1.4.0",
     "level": "^1.4.0",
     "level-serial": "~1.0.0",
     "level-spaces": "~1.1.1",
@@ -34,12 +35,12 @@
     "levelplus": "0.0.5",
     "lodash": "~3.1.0",
     "ms": "~0.7.1",
-    "pb-stream": "~1.1.0",
-    "protobufjs": "github:jfromaniello/protobuf.js#avoid_fn_bind",
+    "protobufjs": "github:jfromaniello/protobuf.js#v5.1.0",
     "randomstring": "~1.0.3",
     "reconnect-net": "0.0.0",
     "redlock": "~1.0.0",
     "through2": "~2.0.0",
+    "v8-profiler": "~5.5.0",
     "varint": "~4.0.0"
   },
   "devDependencies": {

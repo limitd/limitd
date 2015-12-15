@@ -4,10 +4,11 @@ var randomstring     = require('randomstring');
 var reconnect        = require('reconnect-net');
 var RequestMessage   = require('./messages').Request;
 var ResponseMessage  = require('./messages').Response;
-var ErrorResponse  = require('./messages').ErrorResponse;
-var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
+var ErrorResponse    = require('./messages').ErrorResponse;
 var url              = require('url');
 var _                = require('lodash');
+var lps              = require('length-prefixed-stream');
+var through2         = require('through2');
 
 var DEFAULT_PORT = 9231;
 var DEFAULT_HOST = 'localhost';
@@ -37,10 +38,23 @@ LimitdClient.prototype.connect = function (done) {
 
   this.socket = reconnect(function (stream) {
 
-    stream.pipe(ResponseDecoder()).on('data', function (response) {
-      client.emit('response', response);
-      client.emit('response_' + response.request_id, response);
-    });
+    stream
+      .pipe(lps.decode())
+      .pipe(through2.obj(function (chunk, enc, callback) {
+        var decoded;
+
+        try {
+          decoded = ResponseMessage.decode(chunk);
+        } catch(err) {
+          return callback(err);
+        }
+
+        callback(null, decoded);
+      }))
+      .on('data', function (response) {
+        client.emit('response', response);
+        client.emit('response_' + response.request_id, response);
+      });
 
     client.stream = stream;
     client.emit('ready');
@@ -68,12 +82,12 @@ LimitdClient.prototype._request = function (request, type, done) {
     }
   }
 
-  this.stream.write(request.encodeDelimited().toBuffer());
+  this.stream.write(request.encodeDelimited(null, true).toBuffer());
 
   if (!done) return;
 
   this.once('response_' + request.id, function (response) {
-    if (response.type === ResponseMessage.Type.ERROR &&
+    if (response['.limitd.ErrorResponse.response'] &&
         response['.limitd.ErrorResponse.response'].type === ErrorResponse.Type.UNKNOWN_BUCKET_TYPE) {
       return done(new Error(type + ' is not a valid bucket type'));
     }
