@@ -6,11 +6,11 @@ var _      = require('lodash');
 var net = require('net');
 var Buckets = require('./lib/buckets');
 
-var RequestDecoder = require('./messages/decoders').RequestDecoder;
-
-var TypeValidator = require('./lib/pipeline/type_validator');
+var TypeValidator  = require('./lib/pipeline/type_validator');
 var ResponseWriter = require('./lib/pipeline/response_writer');
 var RequestHandler = require('./lib/pipeline/request_handler');
+var RequestDecoder = require('./lib/pipeline/request_decoder');
+
 var lps = require('length-prefixed-stream');
 
 var db = require('./lib/db');

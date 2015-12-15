@@ -5,10 +5,10 @@ var reconnect        = require('reconnect-net');
 var RequestMessage   = require('./messages').Request;
 var ResponseMessage  = require('./messages').Response;
 var ErrorResponse    = require('./messages').ErrorResponse;
-var ResponseDecoder  = require('./messages/decoders').ResponseDecoder;
 var url              = require('url');
 var _                = require('lodash');
 var lps              = require('length-prefixed-stream');
+var through2         = require('through2');
 
 var DEFAULT_PORT = 9231;
 var DEFAULT_HOST = 'localhost';
@@ -40,7 +40,18 @@ LimitdClient.prototype.connect = function (done) {
 
     stream
       .pipe(lps.decode())
-      .pipe(ResponseDecoder()).on('data', function (response) {
+      .pipe(through2.obj(function (chunk, enc, callback) {
+        var decoded;
+
+        try {
+          decoded = ResponseMessage.decode(chunk);
+        } catch(err) {
+          return callback(err);
+        }
+
+        callback(null, decoded);
+      }))
+      .on('data', function (response) {
         client.emit('response', response);
         client.emit('response_' + response.request_id, response);
       });
