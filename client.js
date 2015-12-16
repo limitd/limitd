@@ -16,7 +16,7 @@ var DEFAULT_HOST = 'localhost';
 //This client is deprecate use:
 //    npm install limitd-client --save
 
-function LimitdClient (options) {
+function LimitdClient (options, done) {
   options = options || {};
   EventEmitter.call(this);
   if (typeof options === 'string') {
@@ -27,7 +27,7 @@ function LimitdClient (options) {
     options.host = options.host || DEFAULT_HOST;
   }
   this._options = options;
-  this.connect();
+  this.connect(done);
 }
 
 util.inherits(LimitdClient, EventEmitter);

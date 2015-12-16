@@ -8,7 +8,8 @@
     "url": "http://github.com/auth0/limitd.git"
   },
   "scripts": {
-    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --require ./test/util/fakeDate.js"
+    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --require ./test/util/fakeDate.js",
+    "perf": "node perf/index.js"
   },
   "bin": {
     "limitd": "./bin/limitd"
@@ -45,7 +46,10 @@
   },
   "devDependencies": {
     "chai": "~1.10.0",
+    "cli-table": "~0.3.1",
+    "fast-stats": "0.0.3",
     "mocha": "~2.1.0",
+    "progress": "~1.1.8",
     "rimraf": "~2.2.8"
   }
 }
