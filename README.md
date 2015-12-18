@@ -67,8 +67,8 @@ db: /var/limitd/database
 #define the bucket types
 buckets:
   user:
-    size: 5
-    per_second: 10
+    size: 10
+    per_second: 5
 ```
 
 Start the server:
