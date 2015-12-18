@@ -29,7 +29,7 @@ describe('wrong requests', function () {
 
   it('should disconnect the socket on unknown message', function (done) {
     var socket = new Socket();
-    var ResponseMessage  = require('../messages').Response;
+    var ResponseMessage  = require('../messages/protocol_buffers').Response;
     // I'm going to make the server fail by sending a Response message from the client.
     socket.connect(address.port, address.address)
       .once('connect', function () {

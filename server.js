@@ -6,11 +6,9 @@ var _      = require('lodash');
 var net = require('net');
 var Buckets = require('./lib/buckets');
 
-var TypeValidator  = require('./lib/pipeline/type_validator');
 var ResponseWriter = require('./lib/pipeline/response_writer');
 var RequestHandler = require('./lib/pipeline/request_handler');
 var RequestDecoder = require('./lib/pipeline/request_decoder');
-
 var lps = require('length-prefixed-stream');
 
 var db = require('./lib/db');
@@ -18,7 +16,8 @@ var db = require('./lib/db');
 var defaults = {
   port:      9231,
   hostname:  '0.0.0.0',
-  log_level: 'info'
+  log_level: 'info',
+  protocol:  'protocol-buffers'
 };
 
 /*
@@ -72,7 +71,7 @@ LimitdServer.prototype._handler = function (socket) {
 
   log.debug(sockets_details, 'connection accepted');
 
-  var decoder = RequestDecoder();
+  var decoder = RequestDecoder({ protocol: this._config.protocol });
 
   decoder.on('error', function () {
     log.debug(sockets_details, 'unknown message format');
@@ -81,10 +80,11 @@ LimitdServer.prototype._handler = function (socket) {
 
   socket.pipe(lps.decode())
         .pipe(decoder)
-        .pipe(TypeValidator(this._buckets))
-        .pipe(RequestHandler(this._buckets, log))
-        .pipe(ResponseWriter())
+        .pipe(RequestHandler({protocol: this._config.protocol}, this._buckets, log))
+        .pipe(ResponseWriter({protocol: this._config.protocol}))
+        .pipe(lps.encode())
         .pipe(socket);
+
 };
 
 LimitdServer.prototype.start = function (done) {
