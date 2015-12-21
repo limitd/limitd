@@ -3,4 +3,4 @@
 	url = https://github.com/limitd/protocol.git
 [submodule "avro-protocol"]
 	path = avro-protocol
-	url = git@github.com:limitd/avro-protocol.git
+	url = https://github.com/limitd/avro-protocol.git
