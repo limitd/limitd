@@ -12,13 +12,16 @@ var LimitdServer = require('../server');
 
 var db_file = path.join(__dirname, 'db', 'perf.tests.db');
 
+var protocol = process.argv.indexOf('--avro')  > -1 ? 'avro' : 'protocol-buffers';
+
 try{
   rimraf.sync(db_file);
 } catch(err){}
 
 var server = new LimitdServer({
-  db: db_file,
+  db:        db_file,
   log_level: 'error',
+  protocol:  protocol,
   buckets: {
     ip: {
       per_second: 10
@@ -32,7 +35,7 @@ server.start(function (err, address) {
     console.error(err.message);
     return process.exit(1);
   }
-  var client = new LimitdClient(address);
+  var client = new LimitdClient(_.extend({ protocol: protocol }, address));
   client.once('ready', run_tests);
 });
 
@@ -41,11 +44,11 @@ function run_tests () {
   var client = this;
   var started_at = new Date();
 
-  var requests = 10000;
-  var concurrency = 10;
+  var requests = 100000;
+  var concurrency = 1000;
 
-  console.log('doing %d PING with concurrency of %d', requests, concurrency);
   var progress = new ProgressBar(':bar', { total: requests , width: 50 });
+
   async.mapLimit(_.range(requests), concurrency, function (i, done) {
     var date = new Date();
 
@@ -78,6 +81,7 @@ function run_tests () {
 
 
     table.push(
+        { 'Protocol':   protocol                        },
         { 'Requests':   requests                        },
         { 'Total time': took + ' ms'                    },
         { 'Errored':    errored.length                  },

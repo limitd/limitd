@@ -13,11 +13,16 @@ program.version(require('../package').version)
   .option('-p --port [9231]', 'Port to bind [9231].', '9231')
   .option('-h --hostname [0.0.0.0]', 'Hostname to bind [0.0.0.0].', '0.0.0.0')
   .option('-c --config-file <file>', 'Configuration file.')
+  .option('--avro', 'Use the avro protocol.')
   .option('--profile')
   .parse(process.argv);
 
 
 var config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
+
+if (program.avro) {
+  config.protocol = 'avro';
+}
 
 if (config.configFile) {
   try {

@@ -21,6 +21,16 @@ describe('limitd server', function () {
     run_tests({db: db_file});
   });
 
+  describe('leveldb + avro ', function () {
+    var db_file = path.join(__dirname, 'dbs', 'server_avro.tests.db');
+
+    try{
+      rimraf.sync(db_file);
+    } catch(err){}
+
+    run_tests({db: db_file, protocol: 'avro'});
+  });
+
   describe('on redis', function () {
     var redis_options = {
       backend: 'redis',
@@ -81,7 +91,7 @@ function run_tests (db_options) {
 
     server.start(function (err, address) {
       if (err) return done(err);
-      client = new LimitdClient(address);
+      client = new LimitdClient(_.extend(address, { protocol: db_options.protocol }));
       client.once('connect', done);
     });
   });
