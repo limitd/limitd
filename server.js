@@ -10,6 +10,7 @@ var ResponseWriter = require('./lib/pipeline/response_writer');
 var RequestHandler = require('./lib/pipeline/request_handler');
 var RequestDecoder = require('./lib/pipeline/request_decoder');
 var lps = require('length-prefixed-stream');
+var lps_encode = require('./lib/lps_encode');
 
 var db = require('./lib/db');
 
@@ -82,9 +83,8 @@ LimitdServer.prototype._handler = function (socket) {
         .pipe(decoder)
         .pipe(RequestHandler({protocol: this._config.protocol}, this._buckets, log))
         .pipe(ResponseWriter({protocol: this._config.protocol}))
-        .pipe(lps.encode())
+        .pipe(lps_encode())
         .pipe(socket);
-
 };
 
 LimitdServer.prototype.start = function (done) {

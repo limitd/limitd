@@ -82,7 +82,7 @@ LimitdClient.prototype.connect = function (done) {
     var encoder = client._requestEncoder();
 
     encoder
-      .pipe(lps.encode())
+      .pipe(require('./lib/lps_encode')())
       .pipe(stream);
 
     client.stream = encoder;
