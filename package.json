@@ -43,7 +43,8 @@
     "redlock": "~1.0.0",
     "stream-combiner": "~0.2.2",
     "through2": "~2.0.0",
-    "v8-profiler": "~5.5.0"
+    "v8-profiler": "~5.5.0",
+    "varint": "~4.0.0"
   },
   "devDependencies": {
     "chai": "~1.10.0",
