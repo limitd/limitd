@@ -10,7 +10,7 @@ var async = require('async');
 var _ = require('lodash');
 var Redis = require('ioredis');
 
-describe.only('limitd server', function () {
+describe('limitd server', function () {
   describe('on leveldb', function () {
     var db_file = path.join(__dirname, 'dbs', 'server.tests.db');
 

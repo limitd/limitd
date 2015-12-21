@@ -44,8 +44,8 @@ function run_tests () {
   var client = this;
   var started_at = new Date();
 
-  var requests = 10000;
-  var concurrency = 10;
+  var requests = 100000;
+  var concurrency = 1000;
 
   var progress = new ProgressBar(':bar', { total: requests , width: 50 });
 
@@ -81,6 +81,7 @@ function run_tests () {
 
 
     table.push(
+        { 'Protocol':   protocol                        },
         { 'Requests':   requests                        },
         { 'Total time': took + ' ms'                    },
         { 'Errored':    errored.length                  },
