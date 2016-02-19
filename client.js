@@ -16,7 +16,7 @@ var PbResponseMessage  = require('./messages/protocol_buffers').Response;
 var AvroResponse = require('./messages/avro')['Response/Index'];
 var AvroRequest = require('./messages/avro')['Request/Index'];
 
-//This client is deprecate use:
+// This client is deprecated. Use:
 //    npm install limitd-client --save
 
 function LimitdClient (options, done) {
