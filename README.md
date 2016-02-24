@@ -96,7 +96,7 @@ The core concepts of limitd are:
 -  **Request**: a request made by a client to  **take or wait** N tokens from the **bucket instance X** of the **bucket type y**.
 -  **Response**: is the response from the server to a client request indicating that the operation was succesful or not.
 
-Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [messages/limitd.proto](/blob/master/messages/limitd.proto).
+Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [protocol/messages](https://github.com/limitd/protocol/tree/master/messages).
 
 ## Server operations
 
