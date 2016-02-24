@@ -168,32 +168,6 @@ describe('schema validation', function() {
     expect(validate(config)).to.be.null;
   };
 
-  var invalidMatch = function() {
-    var err = validate({
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          size: 3,
-          match: 'lol'
-        }
-      }
-    });
-    expect(err).to.contain('String does not match pattern');
-  };
-
-  var validMatch = function() {
-    var err = validate({
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          size: 3,
-          match: '!!js/regexp /^10\./ig'
-        }
-      }
-    });
-    expect(err).to.be.null;
-  };
-
   describe('buckets', function() {
     it('should return an error if neither size nor per_${interval} is provided', intervalMissing);
     it('should return an error if more than one per_${interval} property is provided', moreThanOnePerInterval);
@@ -203,8 +177,6 @@ describe('schema validation', function() {
     it('should return an error if size is not a number', sizeNaN);
     it('should return an error if size < 0', negativeSize);
     it('should not return an error if a valid size is provided', validSize);
-    it('should return an error if match is not a regex', invalidMatch);
-    it('should not return an error if match is a regex', validMatch);
 
     describe('override', function() {
       it('should return an error if neither size nor per_${interval} is provided', intervalMissing);
@@ -215,38 +187,6 @@ describe('schema validation', function() {
       it('should return an error if size is not a number', sizeNaN);
       it('should return an error if size < 0', negativeSize);
       it('should not return an error if a valid size is provided', validSize);
-      it('should return an error if match is not a regex', invalidMatch);
-      it('should not return an error if match is a regex', validMatch);
-
-      // it('should return an error if until is not a regex', function() {
-      //  var err = validate({
-      //    db: '/tmp/limitd.db',
-      //    buckets: {
-      //      ip: {
-      //        size: 3,
-      //        override: {
-      //          until: {}
-      //        }
-      //      }
-      //    }
-      //  });
-      //  expect(err).to.contain('String does not match pattern');
-      // });
-
-      // it('should not return an error if until is a regex', function() {
-      //  var err = validate({
-      //    db: '/tmp/limitd.db',
-      //    buckets: {
-      //      ip: {
-      //        size: 3,
-      //        override: {
-      //          until: '!!timestamp 2010-11-18'
-      //        }
-      //      }
-      //    }
-      //  });
-      //  expect(err).to.be.null;
-      // });
     });
   });
 });

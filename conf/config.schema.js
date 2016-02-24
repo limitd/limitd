@@ -25,9 +25,8 @@ var perHourSchema = {
 };
 
 var matchSchema = {
-  type: 'string',
-  description: 'Regexp to match against the key',
-  pattern: '^\!\!js\/regexp .+$'
+  type: ['string', 'object'],
+  description: 'Regexp to match against the key'
 };
 
 // we can have ONE of per_${interval} and/or size
@@ -49,7 +48,7 @@ module.exports = {
   description: 'limitd configuration',
   properties: {
     port: {
-      type: 'integer',
+      type: ['integer', 'string'],
       description: 'The port to use to run the server (defaults to 9231)'
     },
     db: {
@@ -99,9 +98,8 @@ module.exports = {
                     per_hour: perHourSchema,
                     match: matchSchema,
                     until: {
-                      type: 'string',
+                      type: ['string', 'object'],
                       description: 'Timestamp representing when the rule will become invalid'
-                      // pattern: '^\!\!timestamp (0[1-9]|1[012])/(0[1-9]|[12][0-9]|3[01])/(19|20)\d\d( ([01]\d|2[0-3]):[0-5]\d)?$'
                     }
                   }
                 }
