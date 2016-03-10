@@ -11,6 +11,7 @@ var RequestHandler = require('./lib/pipeline/request_handler');
 var RequestDecoder = require('./lib/pipeline/request_decoder');
 var lps = require('length-prefixed-stream');
 var lps_encode = require('./lib/lps_encode');
+var validateConfig = require('./lib/config_validator');
 
 var db = require('./lib/db');
 
@@ -42,6 +43,11 @@ function LimitdServer (options) {
   }
 
   this._config = _.extend({}, defaults, options);
+  var configError = validateConfig(this._config);
+  if (configError) {
+    throw new Error(configError);
+  }
+
   this._logger = logger(this._config.log_level);
   this._server = net.createServer(this._handler.bind(this));
 

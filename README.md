@@ -241,6 +241,17 @@ limitd is a node.js module that works as:
 -  **limitdctl** is a command line utility: https://github.com/limitd/limitdctl
 -  node.js client library for limitd: https://github.com/limitd/node-client
 
+## Running Tests
+
+To run the tests you need to have redis running on the default port (6379).
+
+```sh
+git clone --recurse git@github.com:auth0/limitd.git
+cd limitd
+npm i
+npm test
+```
+
 ## Issue Reporting
 
 If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
