@@ -3,7 +3,7 @@ var oldDate = global.Date;
 /*
  * fix new Date() to a fixed unix timestamp.
  */
-global.Date.fix = function (timestamp) {
+var fix = global.Date.fix = function (timestamp) {
   var time = timestamp * 1000;
 
   if (global.Date.unfake) {
@@ -24,6 +24,8 @@ global.Date.fix = function (timestamp) {
   global.Date.now = function () {
     return time;
   };
+
+  global.Date.fix = fix;
 
   global.Date.unfix = function () {
     global.Date = oldDate;

@@ -28,3 +28,6 @@ buckets:
 
   wrong_password:
     size: 3
+
+  once per hour:
+    per_hour: 1
