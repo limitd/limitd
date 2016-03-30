@@ -8,7 +8,7 @@
     "url": "http://github.com/auth0/limitd.git"
   },
   "scripts": {
-    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --require ./test/util/fakeDate.js",
+    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000",
     "perf": "node perf/index.js"
   },
   "bin": {
@@ -33,7 +33,7 @@
     "level-serial": "~1.0.0",
     "level-spaces": "~1.1.1",
     "level-sublevel": "~6.4.4",
-    "level-ttl": "~2.2.0",
+    "level-ttl": "~3.1.0",
     "levelplus": "0.0.5",
     "lodash": "~3.1.0",
     "ms": "~0.7.1",
@@ -53,6 +53,7 @@
     "cli-table": "~0.3.1",
     "fast-stats": "0.0.3",
     "mocha": "~2.1.0",
+    "mockdate": "~1.0.4",
     "moment": "~2.12.0",
     "progress": "~1.1.8",
     "rimraf": "~2.2.8"

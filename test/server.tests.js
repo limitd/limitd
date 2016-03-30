@@ -9,6 +9,7 @@ var client;
 var async = require('async');
 var _ = require('lodash');
 var Redis = require('ioredis');
+var MockDate = require('mockdate');
 
 describe('limitd server', function () {
   describe('on leveldb', function () {
@@ -101,13 +102,13 @@ function run_tests (db_options) {
   });
 
   afterEach(function () {
-    if (Date.unfix) { Date.unfix(); }
+    MockDate.reset();
   });
 
   describe('TAKE', function () {
     it('should work with a simple request', function (done) {
       var now = 1425920267;
-      Date.fix(now);
+      MockDate.set(now * 1000);
       client.take('ip', '211.123.12.12', function (err, response) {
         if (err) return done(err);
         assert.ok(response.conformant);
@@ -185,7 +186,7 @@ function run_tests (db_options) {
     it('should use seconds ceiling for next reset', function (done) {
       // it takes ~1790 msec to fill the bucket with this test
       var now = 1425920267;
-      Date.fix(now);
+      MockDate.set(now * 1000);
       var requests = _.map(_.range(0, 9), function(){
         return function (cb) {
           client.take('ip', '211.123.12.36', cb);
@@ -204,7 +205,7 @@ function run_tests (db_options) {
 
     it('should set reset to UNIX timestamp regardless of period', function(done){
       var now = 1425920267;
-      Date.fix(now);
+      MockDate.set(now * 1000);
       client.take('ip', '10.0.0.1', function (err, response) {
         if (err) { return done(err); }
         assert.ok(response.conformant);
@@ -219,7 +220,7 @@ function run_tests (db_options) {
   describe('WAIT', function () {
     it('should work with a simple request', function (done) {
       var now = 1425920267;
-      Date.fix(now);
+      MockDate.set(now * 1000);
       client.wait('ip', '211.76.23.4', function (err, response) {
         if (err) return done(err);
         assert.ok(response.conformant);
