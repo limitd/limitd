@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+const level = require('level');
+const path = process.argv[2];
+const db = level(path);
+
+db.get(process.argv[3], function (err, value) {
+  console.dir(value);
+});
