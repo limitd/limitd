@@ -5,9 +5,17 @@ const path = process.argv[2];
 const through2 = require('through2');
 const db = level(path);
 
+const keys_to_delete = [
+
+];
+
 db.createReadStream({})
   .pipe(through2.obj(function (kv, enc, callback) {
-    if (kv.key.indexOf(process.argv[3]) > -1) {
+    var should_delete = keys_to_delete.some(function (k) {
+      return kv.key.indexOf(k) > -1;
+    });
+
+    if (should_delete) {
       return callback(null, kv.key);
     }
     callback();
