@@ -243,7 +243,7 @@ function run_tests (db_options) {
           var waited = Date.now() - waitingSince;
           assert.ok(response.conformant);
           assert.ok(response.delayed);
-          expect(waited).to.be.closeTo(600, 10);
+          expect(waited).to.be.closeTo(600, 20);
           done();
         });
       });
