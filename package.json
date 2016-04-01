@@ -33,7 +33,7 @@
     "level-serial": "~1.0.0",
     "level-spaces": "~1.1.1",
     "level-sublevel": "~6.4.4",
-    "level-ttl": "limitd/level-ttl#fix_concurrency_issue",
+    "level-ttl": "limitd/level-ttl#limitd_changes",
     "levelplus": "0.0.5",
     "lodash": "~3.1.0",
     "ms": "~0.7.1",
