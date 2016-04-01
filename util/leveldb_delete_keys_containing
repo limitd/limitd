@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+const level = require('level');
+const path = process.argv[2];
+const through2 = require('through2');
+const db = level(path);
+
+db.createReadStream({})
+  .pipe(through2.obj(function (kv, enc, callback) {
+    if (kv.key.indexOf(process.argv[3]) > -1) {
+      return callback(null, kv.key);
+    }
+    callback();
+  }))
+  .on('data', function (k) {
+    db.del(k);
+  });
