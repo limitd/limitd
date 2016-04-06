@@ -1,6 +1,7 @@
 #
 # Makefile for deb builds of limitd
 #
+NODE_VERSION="4.3.1"
 
 build_deb: check-fpm-installed check-version-variable check-deb-variables
 	#
@@ -19,10 +20,10 @@ build_deb: check-fpm-installed check-version-variable check-deb-variables
 	--before-remove debian/pre_rm.sh \
 	--prefix /opt --deb-upstart debian/limitd --deb-default debian/limitd_defaults \
 	--url ' $(GIT_URL)' --version $(VERSION_NUMBER) -n limitd \
-	-d 'nodejs' -d 'nodejs-legacy' \
+	-d auth0-node-v$(NODE_VERSION)-linux-x64 \
 	-x '**/.git*' -x '*.tgz' -x '**/test/*' \
 	--description 'Jenkins build $(VERSION_NUMBER) - git commit $(GIT_BRANCH)-$(GIT_COMMIT)' \
-	-t deb -s dir limitd 
+	-t deb -s dir limitd
 
 	git checkout .
 
@@ -41,4 +42,3 @@ check-fpm-installed:
 	@command -v fpm >/dev/null 2>&1 || { echo >&2 "fpm required to build DEBs but not installed"; \
 	echo >&2 "Install with: \n $ sudo apt-get install ruby-dev gcc && sudo gem install fpm"; \
 	echo >&2 "Aborting"; exit 1; }
-
