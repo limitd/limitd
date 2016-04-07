@@ -16,17 +16,16 @@ console none
 limit nofile 10000 10000
 
 # Set DIR and NODE_PATH here, if not set in /etc/default
-#DIR=""
-#CONF_FILE=""
-#NODE_PATH="/opt/iojs-v1.8.4-linux-x64/bin"
-#export PATH=$NODE_PATH:$PATH
 
 script
+  DIR="/usr/bin"
+  NODE_PATH="/usr/bin"
+  
   # If default file, source it
   [ -f /etc/default/limitd_defaults ] && . /etc/default/limitd_defaults
 
   exec start-stop-daemon \
-    -d "/usr/bin" \
+    -d "$DIR" \
     --make-pidfile \
     --pidfile /var/run/$UPSTART_JOB.pid \
     --chuid limitd \
