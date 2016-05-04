@@ -12,6 +12,7 @@ var RequestDecoder = require('./lib/pipeline/request_decoder');
 var lps = require('length-prefixed-stream');
 var lps_encode = require('./lib/lps_encode');
 var validateConfig = require('./lib/config_validator');
+var agent = require('auth0-instrumentation');
 
 var db = require('./lib/db');
 
@@ -31,6 +32,7 @@ var defaults = {
  *  - `port` the port to listen to. Defaults to 9231.
  *  - `hostname` the hostname to bind to. Defaults to INADDR_ANY
  *  - `log_level` the verbosity of the logs. Defaults to 'info'.
+ *  - `metrics_api_key`, the DataDog api key to log metrics to. Defaults to undefined.
  *
  */
 function LimitdServer (options) {
@@ -57,6 +59,17 @@ function LimitdServer (options) {
 
   this._db = db(this._config.db);
   this._buckets = new Buckets(this._db, this._config);
+
+  agent.init({'name': 'limitd'}, {'METRICS_API_KEY': this._config.metrics_api_key});
+
+  if (this._config.metrics_api_key) {
+    setInterval(function() {
+      var memUsage = process.memoryUsage();
+      agent.metrics.gauge('memory.rss', memUsage.rss);
+      agent.metrics.gauge('memory.heapTotal', memUsage.heapTotal);
+      agent.metrics.gauge('memory.heapUsed', memUsage.heapUsed);
+    }, 5000);
+  }
 }
 
 util.inherits(LimitdServer, EventEmitter);
