@@ -60,7 +60,12 @@ function LimitdServer (options) {
   this._db = db(this._config.db);
   this._buckets = new Buckets(this._db, this._config);
 
-  agent.init({'name': 'limitd'}, {'METRICS_API_KEY': this._config.metrics_api_key});
+  agent.init({
+    'name': 'limitd'
+  }, {
+    'METRICS_API_KEY': this._config.metrics_api_key,
+    'ERROR_REPORTER_URL': this._config.error_reporter_url
+  });
 
   if (this._config.metrics_api_key) {
     setInterval(function() {
@@ -70,6 +75,8 @@ function LimitdServer (options) {
       agent.metrics.gauge('memory.heapUsed', memUsage.heapUsed);
     }, 5000);
   }
+
+  agent.errorReporter.patchGlobal();
 }
 
 util.inherits(LimitdServer, EventEmitter);
