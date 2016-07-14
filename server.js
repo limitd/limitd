@@ -20,7 +20,9 @@ var defaults = {
   port:      9231,
   hostname:  '0.0.0.0',
   log_level: 'info',
-  protocol:  'protocol-buffers'
+  protocol:  'protocol-buffers',
+  collect_resource_usage: true,
+  deployment_region: 'unknown'
 };
 
 /*
@@ -33,6 +35,8 @@ var defaults = {
  *  - `hostname` the hostname to bind to. Defaults to INADDR_ANY
  *  - `log_level` the verbosity of the logs. Defaults to 'info'.
  *  - `metrics_api_key`, the DataDog api key to log metrics to. Defaults to undefined.
+ *  - `collect_resource_usage`, boolean - auth0-instrumentation option
+ *  - `deployment_region`, string - auth0-instrumentation option
  *
  */
 function LimitdServer (options) {
@@ -64,7 +68,12 @@ function LimitdServer (options) {
     'name': 'limitd'
   }, {
     'METRICS_API_KEY': this._config.metrics_api_key,
-    'ERROR_REPORTER_URL': this._config.error_reporter_url
+    'ERROR_REPORTER_URL': this._config.error_reporter_url,
+    'COLLECT_RESOURCE_USAGE': this._config.collect_resource_usage
+  });
+
+  agent.metrics.setDefaultTags({
+    region: this._config.deployment_region
   });
 
   if (this._config.metrics_api_key) {
