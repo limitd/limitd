@@ -63,20 +63,11 @@ function LimitdServer (options) {
   agent.init({
     'name': 'limitd'
   }, {
+    'COLLECT_RESOURCE_USAGE': true,
+    'STATSD_HOST': this._config.statsd_host,
     'METRICS_API_KEY': this._config.metrics_api_key,
     'ERROR_REPORTER_URL': this._config.error_reporter_url
   });
-
-  if (this._config.metrics_api_key) {
-    setInterval(function() {
-      var memUsage = process.memoryUsage();
-      agent.metrics.gauge('memory.rss', memUsage.rss);
-      agent.metrics.gauge('memory.heapTotal', memUsage.heapTotal);
-      agent.metrics.gauge('memory.heapUsed', memUsage.heapUsed);
-    }, 5000);
-  }
-
-  agent.errorReporter.patchGlobal();
 }
 
 util.inherits(LimitdServer, EventEmitter);
