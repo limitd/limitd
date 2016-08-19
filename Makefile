@@ -1,7 +1,7 @@
 #
 # Makefile for deb builds of limitd
 #
-NODE_VERSION=4.3.1
+NODE_VERSION="4.4.4"
 DEFAULT_INIT_CONFIG=limitd_defaults
 
 build_deb: check-fpm-installed check-version-variable check-deb-variables
