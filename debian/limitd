@@ -18,19 +18,17 @@ limit nofile 10000 10000
 # Set DIR and NODE_PATH here, if not set in /etc/default
 
 script
-  DIR="/usr/bin"
-  NODE_PATH="/usr/bin"
   
   # If default file, source it
   [ -f /etc/default/limitd_defaults ] && . /etc/default/limitd_defaults
 
   exec start-stop-daemon \
-    -d "$DIR" \
+    -d "${DIR:-/usr}/bin/limitd" \
     --make-pidfile \
     --pidfile /var/run/$UPSTART_JOB.pid \
     --chuid limitd \
     --start \
-    --exec $NODE_PATH/node $DIR/bin/limitd -- --config-file $CONF_FILE >> /var/log/limitd.log 2>&1
+    --exec ${NODE_PATH:-/usr/bin}/node ${DIR:-/usr}/bin/limitd -- --config-file $CONF_FILE >> /var/log/limitd.log 2>&1
 end script
 
 post-start script
