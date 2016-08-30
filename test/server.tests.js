@@ -22,38 +22,38 @@ describe('limitd server', function () {
     run_tests({db: db_file});
   });
 
-  describe('leveldb + avro ', function () {
-    var db_file = path.join(__dirname, 'dbs', 'server_avro.tests.db');
+  // describe('leveldb + avro ', function () {
+  //   var db_file = path.join(__dirname, 'dbs', 'server_avro.tests.db');
 
-    try{
-      rimraf.sync(db_file);
-    } catch(err){}
+  //   try{
+  //     rimraf.sync(db_file);
+  //   } catch(err){}
 
-    run_tests({db: db_file, protocol: 'avro'});
-  });
+  //   run_tests({db: db_file, protocol: 'avro'});
+  // });
 
-  describe('on redis', function () {
-    var redis_options = {
-      backend: 'redis',
-      host: '127.0.0.1',
-      keyPrefix: 'limitd-tests:'
-    };
+  // describe('on redis', function () {
+  //   var redis_options = {
+  //     backend: 'redis',
+  //     host: '127.0.0.1',
+  //     keyPrefix: 'limitd-tests:'
+  //   };
 
-    before(function (done) {
-      var redis = new Redis(redis_options);
+  //   before(function (done) {
+  //     var redis = new Redis(redis_options);
 
-      redis.keys('limitd*', function (err, keys) {
-        keys.forEach(function (key) {
-          redis.del(key.replace(redis_options.keyPrefix, ''));
-        });
-      });
+  //     redis.keys('limitd*', function (err, keys) {
+  //       keys.forEach(function (key) {
+  //         redis.del(key.replace(redis_options.keyPrefix, ''));
+  //       });
+  //     });
 
-      setTimeout(done, 100);
-    });
+  //     setTimeout(done, 100);
+  //   });
 
 
-    run_tests({ db: redis_options });
-  });
+  //   run_tests({ db: redis_options });
+  // });
 
   // describe.skip('on redis cluster', function () {
   //   var redis_options = {
@@ -128,6 +128,21 @@ function run_tests (db_options) {
           return r.conformant;
         }));
         client.take('wrong_password', 'tito', function (err, response) {
+          assert.notOk(response.conformant);
+          done();
+        });
+      });
+    });
+
+    it('should work with an override on a fixed bucket', function (done) {
+      async.map(_.range(0, 2), function (i, cb) {
+        client.take('wrong_password', 'dudu', cb);
+      }, function (err, results) {
+        if (err) return done(err);
+        assert.ok(results.every(function (r) {
+          return r.conformant;
+        }));
+        client.take('wrong_password', 'dudu', function (err, response) {
           assert.notOk(response.conformant);
           done();
         });
@@ -325,6 +340,17 @@ function run_tests (db_options) {
         client.reset('wrong_password', 'calocalaccc', function (err, response) {
           if (err) return done(err);
           assert.equal(response.remaining, 3);
+          done();
+        });
+      });
+    });
+
+    it('should work for a fixed bucket (override)', function (done) {
+      client.take('wrong_password', 'dudu2', function (err, response) {
+        assert.ok(response.conformant);
+        client.reset('wrong_password', 'dudu2', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.remaining, 2);
           done();
         });
       });

@@ -18,16 +18,20 @@ buckets:
       with regexp:
         size: 1000
         per_second: 500
-        match: !!js/regexp /^127\./ig
+        match: !!js/regexp /^127\./i
 
       with regexp2:
         size: 1000
         per_second: 500
         until: !!timestamp 2010-11-18
-        match: !!js/regexp /^10\./ig
+        match: !!js/regexp /^10\./i
 
   wrong_password:
     size: 3
+    override:
+      dudu:
+        match: !!js/regexp /dudu.*/i
+        size: 2
 
   once per hour:
     per_hour: 1
