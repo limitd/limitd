@@ -23,7 +23,7 @@ script
   [ -f /etc/default/limitd_defaults ] && . /etc/default/limitd_defaults
 
   exec start-stop-daemon \
-    -d "${DIR:-/usr}/bin/limitd" \
+    -d "${DIR:-/usr}/bin" \
     --make-pidfile \
     --pidfile /var/run/$UPSTART_JOB.pid \
     --chuid limitd \
