@@ -96,12 +96,23 @@ LimitdServer.prototype._handler = function (socket) {
     return socket.end();
   });
 
+  var response_writer = ResponseWriter({protocol: this._config.protocol});
+
+  var request_handler = RequestHandler({
+    protocol: this._config.protocol,
+    buckets: this._buckets,
+    logger: this._logger,
+    write: (response) => {
+      response_writer.write(response);
+    }
+  });
+
+  response_writer.pipe(lps_encode())
+                 .pipe(socket);
+
   socket.pipe(lps.decode())
         .pipe(decoder)
-        .pipe(RequestHandler({protocol: this._config.protocol}, this._buckets, log))
-        .pipe(ResponseWriter({protocol: this._config.protocol}))
-        .pipe(lps_encode())
-        .pipe(socket);
+        .pipe(request_handler);
 };
 
 LimitdServer.prototype.start = function (done) {
