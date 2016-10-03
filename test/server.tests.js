@@ -368,7 +368,7 @@ function run_tests (db_options) {
 
   });
 
-  describe('STATUS', function () {
+  describe.only('STATUS', function () {
 
     it('should work', function (done) {
       var ip = '211.11.84.12';
@@ -390,6 +390,21 @@ function run_tests (db_options) {
           if (err) return done(err);
           assert.equal(response.items[0].remaining, 2);
           done();
+        });
+      });
+    });
+
+
+    it('should not return fulfilled fixed buckets', function (done) {
+      client.take('wrong_password', 'catrasca', function (err) {
+        if (err) return done(err);
+        client.put('wrong_password', 'catrasca', function (err) {
+          if (err) return done(err);
+          client.status('wrong_password', 'catrasca', function (err, response) {
+            if (err) return done(err);
+            assert.equal(response.items.length, 0);
+            done();
+          });
         });
       });
     });
