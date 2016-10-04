@@ -368,7 +368,7 @@ function run_tests (db_options) {
 
   });
 
-  describe.only('STATUS', function () {
+  describe('STATUS', function () {
 
     it('should work', function (done) {
       var ip = '211.11.84.12';
