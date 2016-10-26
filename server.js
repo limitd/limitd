@@ -148,7 +148,7 @@ LimitdServer.prototype.stop = function () {
   var address = self._server.address();
 
   var timeout = setTimeout(function () {
-    this._server.destroy();
+    self._server.destroy();
   }, 500);
 
   this._server.close(function() {
