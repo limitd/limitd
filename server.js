@@ -15,6 +15,7 @@ var validateConfig = require('./lib/config_validator');
 var agent = require('auth0-instrumentation');
 
 var db = require('./lib/db');
+var enableDestroy = require('server-destroy');
 
 var defaults = {
   port:      9231,
@@ -52,6 +53,7 @@ function LimitdServer (options) {
 
   this._logger = logger(this._config.log_level);
   this._server = net.createServer(this._handler.bind(this));
+  enableDestroy(this._server);
 
   this._server.on('error', function (err) {
     self.emit('error', err);
@@ -145,7 +147,12 @@ LimitdServer.prototype.stop = function () {
   var log = self._logger;
   var address = self._server.address();
 
+  var timeout = setTimeout(function () {
+    this._server.destroy();
+  }, 500);
+
   this._server.close(function() {
+    clearTimeout(timeout);
     log.debug(address, 'server closed');
     self.emit('close');
   });
