@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  limitd:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        config: ./docker/limitd.conf.docker
+    image: limitd
+
+  test:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile.test
+    tty: true

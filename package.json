@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000",
-    "perf": "node perf/index.js"
+    "perf": "node perf/index.js",
+    "docker-test": "docker-compose build test && docker-compose run test"
   },
   "bin": {
     "limitd": "./bin/limitd"
