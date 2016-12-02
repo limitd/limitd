@@ -154,6 +154,13 @@ The server configuration file uses [YAML](http://www.yaml.org/).
 * Description: Specifies the amount of tokens to add to the bucket per interval.
 * Notes: Only specify one interval.
 
+### `buckets.{type}.override.{key}.match`
+
+* Type: `String`
+* Description: When `{key}` contains dynamic values (i.e: IPs) you can filter using a regular expression over the `key`.
+* Usage: `!!js/regexp /pattern/gim` where the `pattern` is a javascript regular expression pattern and `gim` are the [options](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Advanced_searching_with_flags) to be applied.
+
+
 <a name="client_api"></a>
 ## Client API
 
