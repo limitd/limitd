@@ -41,11 +41,6 @@ var server = new LimitdServer(config);
 
 server.start();
 
-if (program.profile) {
-  var profiler = require('v8-profiler');
-  profiler.startProfiling('1', true);
-}
-
 function finish () {
   if (program.profile) {
     var profile1 = profiler.stopProfiling();
