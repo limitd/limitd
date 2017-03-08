@@ -230,6 +230,20 @@ function run_tests (db_options) {
         done();
       });
     });
+
+    it('should work for unlimited', function (done) {
+      var now = 1425920267;
+      MockDate.set(now * 1000);
+      client.take('ip', '0.0.0.0', function (err, response) {
+        if (err) return done(err);
+        assert.ok(response.conformant);
+        assert.equal(response.remaining, 100);
+        assert.equal(response.reset, now);
+        assert.equal(response.limit, 100);
+        done();
+      });
+    });
+
   });
 
   describe('WAIT', function () {
@@ -378,6 +392,19 @@ function run_tests (db_options) {
         client.status('ip', ip, function (err, response) {
           if (err) return done(err);
           assert.equal(response.items[0].remaining, 9);
+          done();
+        });
+      });
+    });
+
+    it('should work for unlimited', function (done) {
+      var now = 1425920267;
+      MockDate.set(now * 1000);
+      client.take('ip', '0.0.0.0', function (err) {
+        if (err) return done(err);
+        client.status('ip', '0.0.0.0', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.items.length, 0);
           done();
         });
       });
