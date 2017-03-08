@@ -1,6 +1,8 @@
-port: 9001
+port: /tmp/limitd.socket
 
 log_level: error
+
+db: db/perf.tests.db
 
 buckets:
   ip:

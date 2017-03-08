@@ -1,83 +1,158 @@
-const path         = require('path');
-const async        = require('async');
-const rimraf       = require('rimraf');
-const _            = require('lodash');
-const Stats        = require('fast-stats').Stats;
-const Table        = require('cli-table');
-const ProgressBar  = require('progress');
-const cluster      = require('cluster');
-const LimitdServer = require('../server');
+const path    = require('path');
+const async   = require('async');
+const rimraf  = require('rimraf');
+const _       = require('lodash');
+const Stats   = require('fast-stats').Stats;
+const Table   = require('cli-table');
+const spawn   = require('child_process').spawn;
+const cluster = require('cluster');
 
-const protocol = process.argv.indexOf('--avro')  > -1 ? 'avro' : 'protocol-buffers';
+const requests  =  20000;
+const concurrency = 2000;
+const client_count =  1; //os.cpus().length - 1;
 
-if (cluster.isMaster) {
-  var db_file = path.join(__dirname, 'db', 'perf.tests.db');
-
+function spawn_server() {
 
   try{
+    const db_file = path.join(__dirname, 'db', 'perf.tests.db');
     rimraf.sync(db_file);
   } catch(err){}
 
-  var server = new LimitdServer({
-    db:        db_file,
-    log_level: 'error',
-    protocol:  protocol,
-    buckets: {
-      ip: {
-        size: 1000,
-        override: {
-          '10.0.0.1': {
-            size: 1000,
-            unlimited: true
-          }
-        }
+  const run_with_profile = process.argv.indexOf('--profile') > -1;
+  const flame_graph = process.argv.indexOf('--0x') > -1;
+  const debug = process.argv.indexOf('--debug') > -1;
+
+  var limitd_args = [
+                      path.normalize(__dirname + '/../bin/limitd'),
+                      '--config-file',
+                      'config.yml'
+                    ];
+
+  if (flame_graph) {
+    limitd_args = [
+      'node',
+      '--trace-hydrogen',
+      '--trace-phase=Z',
+      '--trace-deopt',
+      '--code-comments',
+      '--hydrogen-track-positions',
+      '--redirect-code-traces',
+      '--redirect-code-traces-to=code.asm'
+    ].concat(limitd_args);
+  }
+
+  if (run_with_profile) {
+    limitd_args.push('--profile');
+  }
+
+  var executable = 'node';
+
+  if (flame_graph) {
+    executable = '0x';
+  } else if (debug) {
+    executable = 'node-debug';
+  }
+
+  return spawn(executable, limitd_args, { stdio: 'inherit' });
+}
+
+function render_results(started_at, results) {
+  var took    = new Date() - started_at;
+  var errored = _.filter(results, 'err');
+
+  var times = _(results).filter(function (r) { return !r.err; }).map('took').value();
+  var stats = new Stats().push(times);
+
+  var table = new Table();
+
+  table.push(
+      { 'Requests':    requests * client_count         },
+      { 'Concurrency': concurrency * client_count      },
+      { 'Total time':  took + ' ms'                    },
+      { 'Errored':     errored.length                  },
+      { 'Mean':        stats.amean().toFixed(2)        },
+      { 'P50':         stats.percentile(50).toFixed(2) },
+      { 'P95':         stats.percentile(95).toFixed(2) },
+      { 'P97':         stats.percentile(97).toFixed(2) },
+      { 'Max':         _.max(times)                    },
+      { 'Min':         _.min(times)                    }
+  );
+
+  console.log(table.toString());
+}
+
+if (cluster.isMaster) {
+  process.title = 'limitd perfomance master';
+
+  var results = [];
+  const started_at = new Date();
+
+  const server = spawn_server();
+
+  console.log('server pid:', server.pid);
+
+  const workers = _.range(client_count).map(() => cluster.fork());
+
+
+  workers.forEach((worker) => {
+    worker.once('message', (message) => {
+      results = results.concat(message.results);
+      if (results.length === client_count * requests) {
+        console.log('rendering stats');
+        render_results(started_at, results);
+        server.kill('SIGINT');
+        try{
+          const db_file = path.join(__dirname, 'db', 'perf.tests.db');
+          rimraf.sync(db_file);
+        } catch(err){}
       }
-    }
+      worker.kill();
+    });
   });
-
-
-  server.start(function (err, address) {
-    if (err) {
-      console.error(err.message);
-      return process.exit(1);
-    }
-    cluster.fork({LIMITD_HOST: `limitd://${address.address}:${address.port}`});
-  });
-
-  cluster.on('exit', (worker, code) => process.exit(code));
 
   return;
 }
 
+
 const LimitdClient = require('limitd-client');
 
-const client = new LimitdClient({ protocol: protocol, timeout: '60s', host: process.env.LIMITD_HOST });
+const clients = _.range(10).map(() => {
+  const client = new LimitdClient({
+    host: '/tmp/limitd.socket',
+    timeout: 60000,
+    protocol_version: 2
+  });
 
-client.once('ready', run_tests);
+  client.once('ready', waitAll);
+
+  return client;
+});
+
+function waitAll(){
+  if(clients.every(c => c.socket && c.socket.connected)){
+    run_tests();
+  }
+}
 
 
 function run_tests () {
-  var client = this;
-  var started_at = new Date();
-
-  var requests = 100000;
-  var concurrency = 1000;
-
-  var progress = new ProgressBar(':bar', { total: requests , width: 50 });
+  // var snapshot1, snapshot2;
 
   async.mapLimit(_.range(requests), concurrency, function (i, done) {
-    var date = new Date();
-
+    const date = new Date();
+    const clientIndex = i % clients.length;
+    const client = clients[clientIndex];
     return client.take('ip', '10.0.0.1', function (err, result) {
-      progress.tick();
       if (err) {
         console.dir(err);
         return process.exit(1);
       }
+
+      const took1 = new Date() - date;
       done(null, {
         err: err,
         result: result,
-        took: new Date() - date
+        took: took1
       });
     });
 
@@ -87,31 +162,28 @@ function run_tests () {
       return process.exit(1);
     }
 
-    var took    = new Date() - started_at;
-    var errored = _.filter(results, 'err');
+    // console.log(`slow gc cycles: ${slowGC.length}`);
 
-    var times = _(results).filter(function (r) { return !r.err; }).map('took').value();
-    var stats = new Stats().push(times);
+    process.send({
+      type: 'finish',
+      results
+    });
 
-    var table = new Table();
+    // snapshot1.export()
+    //   .pipe(fs.createWriteStream(`snapshot-1-${Date.now()}.heapsnapshot`))
+    //   .on('finish', () => {
+    //     snapshot1.delete();
 
-
-    table.push(
-        { 'Protocol':   protocol                        },
-        { 'Requests':   requests                        },
-        { 'Total time': took + ' ms'                    },
-        { 'Errored':    errored.length                  },
-        { 'Mean':       stats.amean().toFixed(2)        },
-        { 'P50':        stats.percentile(50).toFixed(2) },
-        { 'P95':        stats.percentile(95).toFixed(2) },
-        { 'P97':        stats.percentile(97).toFixed(2) },
-        { 'Max':        _.max(times)                    },
-        { 'Min':        _.min(times)                    }
-    );
-
-    console.log(table.toString());
-
-    process.exit(0);
+    //     snapshot2.export()
+    //       .pipe(fs.createWriteStream(`snapshot-2-${Date.now()}.heapsnapshot`))
+    //       .on('finish', () => {
+    //         snapshot2.delete();
+    //         process.send({
+    //           type: 'finish',
+    //           results
+    //         });
+    //       });
+    //   });
 
   });
 }
