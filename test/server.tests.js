@@ -106,7 +106,7 @@ function run_tests (db_options) {
   });
 
   describe('TAKE', function () {
-    it('should work with a simple request', function (done) {
+    it.only('should work with a simple request', function (done) {
       var now = 1425920267;
       MockDate.set(now * 1000);
       client.take('ip', '211.123.12.12', function (err, response) {
