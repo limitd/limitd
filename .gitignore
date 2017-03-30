@@ -36,3 +36,5 @@ node_modules
 perf/profile-*
 perf/hydrogen-*
 code.asm
+
+perf/db

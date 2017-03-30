@@ -7,7 +7,7 @@ const Table   = require('cli-table');
 const spawn   = require('child_process').spawn;
 const cluster = require('cluster');
 
-const requests  =  20000;
+const requests  =  200000;
 const concurrency = 2000;
 const client_count =  1; //os.cpus().length - 1;
 
@@ -25,7 +25,9 @@ function spawn_server() {
   var limitd_args = [
                       path.normalize(__dirname + '/../bin/limitd'),
                       '--config-file',
-                      'config.yml'
+                      `${__dirname}/config.yml`,
+                      '--db',
+                      `${__dirname}/db`,
                     ];
 
   if (flame_graph) {
