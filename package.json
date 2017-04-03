@@ -33,7 +33,7 @@
     "reconnect-net": "0.0.0",
     "server-destroy": "^1.0.1",
     "typedarray-to-buffer": "^3.1.2",
-    "v8-profiler": "~5.5.0",
+    "v8-profiler": "^5.7.0",
     "z-schema": "^3.16.1",
     "z-schema-errors": "^0.2.1"
   },

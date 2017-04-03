@@ -126,8 +126,9 @@ const LimitdClient = require('limitd-client');
 
 const clients = _.range(10).map(() => {
   const client = new LimitdClient({
+    host: '/tmp/limitd.socket',
     timeout: 60000,
-    hosts: ['limitd://localhost:9001']
+    protocol_version: 2
   });
 
   client.once('ready', waitAll);

@@ -1,8 +1,6 @@
 const RequestHandler = require('../lib/pipeline/RequestHandler');
-const profiler = require('v8-profiler');
 const PassThrough = require('readable-stream').PassThrough;
 const Readable = require('readable-stream').Readable;
-const fs = require('fs');
 
 const objects = 1000000;
 var pushed = 0;
