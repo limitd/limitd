@@ -54,6 +54,7 @@
     "chai": "~1.10.0",
     "cli-table": "~0.3.1",
     "fast-stats": "0.0.3",
+    "limitd-client": "^1.13.1",
     "mocha": "~2.1.0",
     "mockdate": "~1.0.4",
     "moment": "~2.12.0",

@@ -1,0 +1,11 @@
+port: 9001
+
+log_level: error
+
+buckets:
+  ip:
+    size: 1000
+    override:
+      '10.0.0.1':
+        size: 1000
+        unlimited: true
