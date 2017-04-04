@@ -38,3 +38,5 @@ perf/hydrogen-*
 code.asm
 
 perf/db
+
+*.orig
