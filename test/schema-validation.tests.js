@@ -173,7 +173,8 @@ describe('schema validation', function() {
       db: '/tmp/limitd.db',
       buckets: {
         ip: {
-          unlimited: true
+          unlimited: true,
+          size: 20
         }
       }
     };
@@ -186,9 +187,11 @@ describe('schema validation', function() {
       buckets: {
         ip: {
           unlimited: true,
+          size: 50,
           override: {
             'tenant-key': {
-              unlimited: false
+              unlimited: false,
+              size: 100
             }
           }
         }

@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var sizeSchema = {
   type: 'integer',
   description: 'Size of the bucket (defaults to 0)',
@@ -48,7 +46,7 @@ var requiredOptions = [
     required: ['size']
   },
   {
-    required: [ 'unlimited' ]
+    required: [ 'unlimited', 'size' ]
   }
 ];
 
