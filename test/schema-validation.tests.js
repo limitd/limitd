@@ -168,6 +168,35 @@ describe('schema validation', function() {
     expect(validate(config)).to.be.null;
   };
 
+  var validUnlimited = function() {
+    var config = {
+      db: '/tmp/limitd.db',
+      buckets: {
+        ip: {
+          unlimited: true
+        }
+      }
+    };
+    expect(validate(config)).to.be.null;
+  };
+
+  var validUnlimitedOverride = function(){
+    var config = {
+      db: '/tmp/limitd.db',
+      buckets: {
+        ip: {
+          unlimited: true,
+          override: {
+            'tenant-key': {
+              unlimited: false
+            }
+          }
+        }
+      }
+    };
+    expect(validate(config)).to.be.null;
+  };
+
   describe('buckets', function() {
     it('should return an error if neither size nor per_${interval} is provided', intervalMissing);
     it('should return an error if more than one per_${interval} property is provided', moreThanOnePerInterval);
@@ -177,6 +206,7 @@ describe('schema validation', function() {
     it('should return an error if size is not a number', sizeNaN);
     it('should return an error if size < 0', negativeSize);
     it('should not return an error if a valid size is provided', validSize);
+    it('should not return an error if a valid unlimited is unlimited', validUnlimited);
 
     describe('override', function() {
       it('should return an error if neither size nor per_${interval} is provided', intervalMissing);
@@ -186,7 +216,7 @@ describe('schema validation', function() {
       it('should not return an error if one valid per_${interval} is provided', validInterval);
       it('should return an error if size is not a number', sizeNaN);
       it('should return an error if size < 0', negativeSize);
-      it('should not return an error if a valid size is provided', validSize);
+      it('should not return an error if a valid size is provided', validUnlimitedOverride);
     });
   });
 });
