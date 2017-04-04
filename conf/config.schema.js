@@ -29,6 +29,12 @@ var matchSchema = {
   description: 'Regexp to match against the key'
 };
 
+var unlimitedSchema = {
+  type: 'boolean',
+  description: 'true if no limit should exist for the bucket type (or key override). false otherwise',
+  default: false
+};
+
 // we can have ONE of per_${interval} and/or size
 var requiredOptions = [
   {
@@ -40,6 +46,9 @@ var requiredOptions = [
   },
   {
     required: ['size']
+  },
+  {
+    required: [ 'unlimited' ]
   }
 ];
 
@@ -82,6 +91,7 @@ module.exports = {
             per_minute: perMinuteSchema,
             per_hour: perHourSchema,
             match: matchSchema,
+            unlimited: unlimitedSchema,
             override: {
               type: 'object',
               description: 'Custom configuration for a bucket with the specified key for the particular type',
@@ -97,6 +107,7 @@ module.exports = {
                     per_minute: perMinuteSchema,
                     per_hour: perHourSchema,
                     match: matchSchema,
+                    unlimited: unlimitedSchema,
                     until: {
                       type: ['string', 'object'],
                       description: 'Timestamp representing when the rule will become invalid'
