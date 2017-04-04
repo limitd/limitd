@@ -1,6 +1,6 @@
-var expect = require('chai').expect;
-var _ = require('lodash');
-var validate = require('../lib/config_validator');
+const expect = require('chai').expect;
+const _ = require('lodash');
+const validate = require('../lib/config_validator');
 
 describe('schema validation', function() {
   it('should return an error for an empty config', function() {
@@ -67,159 +67,161 @@ describe('schema validation', function() {
     });
   });
 
-  var intervalMissing = function() {
-    var err = validate({
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          purpose: 'Whatever'
+  describe('buckets', function() {
+
+    it('should return an error if neither size nor interval is provided', function() {
+      var err = validate({
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            purpose: 'Whatever'
+          }
         }
-      }
+      });
+      expect(err).to.contain('Use only one of: per_second / per_minute / per_hour');
     });
-    expect(err).to.contain('Use only one of: per_second / per_minute / per_hour');
-  };
 
-  var moreThanOnePerInterval = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {}
-      }
-    };
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { size: 1, per_second: 1, per_minute: 2 } } }))).to.be.not.null;
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: 1, per_hour: 2 } } }))).to.be.not.null;
-    var err = validate(_.extend(_.clone(config), { buckets: { ip: { per_second: 1, per_hour: 2 } } }));
-    expect(err).to.contain('Use only one of: per_second / per_minute / per_hour');
-  };
-
-  var intervalNaN = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {}
-      }
-    };
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_second: 'a' } } }))).to.be.not.null;
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: 'a' } } }))).to.be.not.null;
-    var err = validate(_.extend(_.clone(config), { buckets: { ip: { per_hour: 'a' } } }));
-    expect(err).to.contain('Expected type integer but found type string');
-  };
-
-  var negativeInterval = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {}
-      }
-    };
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_second: -1 } } }))).to.be.not.null;
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: -1 } } }))).to.be.not.null;
-    var err = validate(_.extend(_.clone(config), { buckets: { ip: { per_hour: -1 } } }));
-    expect(err).to.contain('Value -1 is less than minimum 1');
-  };
-
-  var validInterval = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {}
-      }
-    };
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_second: 1 } } }))).to.be.null;
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: 1 } } }))).to.be.null;
-    expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_hour: 1 } } }))).to.be.null;
-  };
-
-  var sizeNaN = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          size: 'a'
+    it('should return an error if more than one interval property is provided', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {}
         }
-      }
-    };
-    var err = validate(config);
-    expect(err).to.contain('Expected type integer but found type string');
-  };
+      };
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { size: 1, per_second: 1, per_minute: 2 } } }))).to.be.not.null;
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: 1, per_hour: 2 } } }))).to.be.not.null;
+      var err = validate(_.extend(_.clone(config), { buckets: { ip: { per_second: 1, per_hour: 2 } } }));
+      expect(err).to.contain('Use only one of: per_second / per_minute / per_hour');
+    });
 
-  var negativeSize = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          size: -2
+    it('should return an error if per_${interval} is not a number', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {}
         }
-      }
-    };
-    var err = validate(config);
-    expect(err).to.contain('Value -2 is less than minimum 0');
-  };
+      };
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_second: 'a' } } }))).to.be.not.null;
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: 'a' } } }))).to.be.not.null;
+      var err = validate(_.extend(_.clone(config), { buckets: { ip: { per_hour: 'a' } } }));
+      expect(err).to.contain('Expected type integer but found type string');
+    });
 
-  var validSize = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          size: 3
+    it('should return an error if per_${interval} < 0', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {}
         }
-      }
-    };
-    expect(validate(config)).to.be.null;
-  };
+      };
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_second: -1 } } }))).to.be.not.null;
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: -1 } } }))).to.be.not.null;
+      var err = validate(_.extend(_.clone(config), { buckets: { ip: { per_hour: -1 } } }));
+      expect(err).to.contain('Value -1 is less than minimum 1');
+    });
 
-  var validUnlimited = function() {
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          unlimited: true,
-          size: 20
+    it('should not return an error if one valid per_${interval} is provided', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {}
         }
-      }
-    };
-    expect(validate(config)).to.be.null;
-  };
+      };
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_second: 1 } } }))).to.be.null;
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_minute: 1 } } }))).to.be.null;
+      expect(validate(_.extend(_.clone(config), { buckets: { ip: { per_hour: 1 } } }))).to.be.null;
+    });
 
-  var validUnlimitedOverride = function(){
-    var config = {
-      db: '/tmp/limitd.db',
-      buckets: {
-        ip: {
-          unlimited: true,
-          size: 50,
-          override: {
-            'tenant-key': {
-              unlimited: false,
-              size: 100
+    it('should return an error if size is not a number', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            size: 'a'
+          }
+        }
+      };
+      var err = validate(config);
+      expect(err).to.contain('Expected type integer but found type string');
+    });
+
+    it('should return an error if size < 0', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            size: -2
+          }
+        }
+      };
+      var err = validate(config);
+      expect(err).to.contain('Value -2 is less than minimum 0');
+    });
+
+    it('should not return an error if a valid size is provided', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            size: 3
+          }
+        }
+      };
+      expect(validate(config)).to.be.null;
+    });
+
+    it('should not return an error if a valid unlimited is unlimited', function() {
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            unlimited: true,
+            size: 20
+          }
+        }
+      };
+      expect(validate(config)).to.be.null;
+    });
+
+    it('should not return an error if a valid size and unlimited parameter is provided in an override', function(){
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            unlimited: true,
+            size: 50,
+            override: {
+              'tenant-key': {
+                unlimited: false,
+                size: 100
+              }
             }
           }
         }
-      }
-    };
-    expect(validate(config)).to.be.null;
-  };
-
-  describe('buckets', function() {
-    it('should return an error if neither size nor per_${interval} is provided', intervalMissing);
-    it('should return an error if more than one per_${interval} property is provided', moreThanOnePerInterval);
-    it('should return an error if per_${interval} is not a number', intervalNaN);
-    it('should return an error if per_${interval} < 0', negativeInterval);
-    it('should not return an error if one valid per_${interval} is provided', validInterval);
-    it('should return an error if size is not a number', sizeNaN);
-    it('should return an error if size < 0', negativeSize);
-    it('should not return an error if a valid size is provided', validSize);
-    it('should not return an error if a valid unlimited is unlimited', validUnlimited);
-
-    describe('override', function() {
-      it('should return an error if neither size nor per_${interval} is provided', intervalMissing);
-      it('should return an error if more than one per_${interval} property is provided', moreThanOnePerInterval);
-      it('should return an error if per_${interval} is not a number', intervalNaN);
-      it('should return an error if per_${interval} < 0', negativeInterval);
-      it('should not return an error if one valid per_${interval} is provided', validInterval);
-      it('should return an error if size is not a number', sizeNaN);
-      it('should return an error if size < 0', negativeSize);
-      it('should not return an error if a valid size is provided', validUnlimitedOverride);
+      };
+      expect(validate(config)).to.be.null;
     });
+
+    it('should return an error when providing an extra property on override', function(){
+      var config = {
+        db: '/tmp/limitd.db',
+        buckets: {
+          ip: {
+            unlimited: true,
+            size: 50,
+            override: {
+              'tenant-key': {
+                unlimited: false,
+                size: 100,
+                chamame: true
+              }
+            }
+          }
+        }
+      };
+      expect(validate(config)).to.contain('Additional properties not allowed');
+    });
+
+
   });
 });
