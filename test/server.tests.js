@@ -1,90 +1,24 @@
-var LimitdServer = require('..').Server;
-var LimitdClient = require('..').Client;
+const LimitdServer = require('..').Server;
+const LimitdClient = require('limitd-client');
 
-var assert = require('chai').assert;
-var expect = require('chai').expect;
-var rimraf = require('rimraf');
-var path   = require('path');
+const assert   = require('chai').assert;
+const expect   = require('chai').expect;
+const rimraf   = require('rimraf');
+const path     = require('path');
+const async    = require('async');
+const _        = require('lodash');
+const MockDate = require('mockdate');
+
 var client;
-var async = require('async');
-var _ = require('lodash');
-var Redis = require('ioredis');
-var MockDate = require('mockdate');
-
 describe('limitd server', function () {
-  describe('on leveldb', function () {
-    var db_file = path.join(__dirname, 'dbs', 'server.tests.db');
+  var db_file = path.join(__dirname, 'dbs', 'server.tests.db');
 
-    try{
-      rimraf.sync(db_file);
-    } catch(err){}
+  try{
+    rimraf.sync(db_file);
+  } catch(err){}
 
-    run_tests({db: db_file});
-  });
+  const db_options = { db: db_file };
 
-  // describe('leveldb + avro ', function () {
-  //   var db_file = path.join(__dirname, 'dbs', 'server_avro.tests.db');
-
-  //   try{
-  //     rimraf.sync(db_file);
-  //   } catch(err){}
-
-  //   run_tests({db: db_file, protocol: 'avro'});
-  // });
-
-  // describe('on redis', function () {
-  //   var redis_options = {
-  //     backend: 'redis',
-  //     host: '127.0.0.1',
-  //     keyPrefix: 'limitd-tests:'
-  //   };
-
-  //   before(function (done) {
-  //     var redis = new Redis(redis_options);
-
-  //     redis.keys('limitd*', function (err, keys) {
-  //       keys.forEach(function (key) {
-  //         redis.del(key.replace(redis_options.keyPrefix, ''));
-  //       });
-  //     });
-
-  //     setTimeout(done, 100);
-  //   });
-
-
-  //   run_tests({ db: redis_options });
-  // });
-
-  // describe.skip('on redis cluster', function () {
-  //   var redis_options = {
-  //     backend: 'redis',
-  //     keyPrefix: 'limitd-tests:',
-  //     nodes: [
-  //       {
-  //         host: '127.0.0.1'
-  //       }
-  //     ]
-  //   };
-
-  //   before(function (done) {
-  //     var redis = new Redis(redis_options);
-
-  //     redis.keys('limitd*', function (err, keys) {
-  //       keys.forEach(function (key) {
-  //         redis.del(key.replace(redis_options.keyPrefix, ''));
-  //       });
-  //     });
-
-  //     setTimeout(done, 100);
-  //   });
-
-
-  //   run_tests({ db: redis_options });
-  // });
-});
-
-
-function run_tests (db_options) {
   var server;
 
   before(function (done) {
@@ -92,7 +26,7 @@ function run_tests (db_options) {
 
     server.start(function (err, address) {
       if (err) return done(err);
-      client = new LimitdClient(_.extend(address, { protocol: db_options.protocol }));
+      client = new LimitdClient(`limitd://localhost:${address.port}`);
       client.once('connect', done);
     });
   });
@@ -135,7 +69,7 @@ function run_tests (db_options) {
     });
 
     it('should work with an override on a fixed bucket', function (done) {
-      async.map(_.range(0, 2), function (i, cb) {
+      async.map(_.range(2), function (i, cb) {
         client.take('wrong_password', 'dudu', cb);
       }, function (err, results) {
         if (err) return done(err);
@@ -272,16 +206,17 @@ function run_tests (db_options) {
           var waited = Date.now() - waitingSince;
           assert.ok(response.conformant);
           assert.ok(response.delayed);
-          expect(waited).to.be.closeTo(600, 20);
+          expect(waited).to.be.closeTo(600, 100);
           done();
         });
       });
     });
+
   });
 
   it('should fail when the bucket type doesnt exist', function (done) {
     client.take('blabla', '211.123.12.12', function (err) {
-      assert.equal(err.message, 'blabla is not a valid bucket type');
+      assert.equal(err.message, 'Invalid bucket type');
       done();
     });
   });
@@ -290,7 +225,7 @@ function run_tests (db_options) {
     client.take('ip', '211.45.66.1', function (err) {
       if (err) return done(err);
       setTimeout(function () {
-        server._db.create('ip').get('211.45.66.1', function (err, result) {
+        server._db._types['ip'].db.get('211.45.66.1', function (err, result) {
           assert.isUndefined(result);
           done();
         });
@@ -301,9 +236,9 @@ function run_tests (db_options) {
 
   describe('PUT', function () {
     it('should restore the bucket when reseting', function (done) {
-      client.take('ip', '211.123.12.12', function (err, response) {
+      client.take('ip', '211.123.12.12', function (err) {
         if (err) return done(err);
-        client.put('ip', '211.123.12.12', function (err, response) {
+        client.put('ip', '211.123.12.12', function (err, result) {
           if (err) return done(err);
           client.take('ip', '211.123.12.12', function (err, response) {
             if (err) return done(err);
@@ -468,5 +403,6 @@ function run_tests (db_options) {
     });
 
   });
+});
 
-}
+

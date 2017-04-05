@@ -1,4 +1,4 @@
-port: 9001
+port: /tmp/limitd.socket
 
 log_level: error
 

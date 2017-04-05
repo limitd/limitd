@@ -30,3 +30,13 @@ build/Release
 node_modules
 
 .DS_Store
+
+*.cpuprofile
+
+perf/profile-*
+perf/hydrogen-*
+code.asm
+
+perf/db
+
+*.orig

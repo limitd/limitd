@@ -23,7 +23,6 @@ function spawn_server() {
   const debug = process.argv.indexOf('--debug') > -1;
 
   var limitd_args = [
-                      '--max_old_space_size=5000',
                       path.normalize(__dirname + '/../bin/limitd'),
                       '--config-file',
                       `${__dirname}/config.yml`,
@@ -126,8 +125,9 @@ const LimitdClient = require('limitd-client');
 
 const clients = _.range(10).map(() => {
   const client = new LimitdClient({
+    host: '/tmp/limitd.socket',
     timeout: 60000,
-    hosts: ['limitd://localhost:9001']
+    protocol_version: 2
   });
 
   client.once('ready', waitAll);

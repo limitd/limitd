@@ -1,6 +1,3 @@
 [submodule "protocol"]
 	path = protocol
 	url = https://github.com/limitd/protocol.git
-[submodule "avro-protocol"]
-	path = avro-protocol
-	url = https://github.com/limitd/avro-protocol.git

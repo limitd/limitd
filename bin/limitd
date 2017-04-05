@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 
-var program = require('commander');
-var path = require('path');
-var fs = require('fs');
-var yaml = require('js-yaml');
-var _ = require('lodash');
+process.title = 'limitd server';
 
-var LimitdServer = require('../server');
+const program  = require('commander');
+const path     = require('path');
+const fs       = require('fs');
+const yaml     = require('js-yaml');
+const _        = require('lodash');
+const profiler = require('v8-profiler');
+
+const LimitdServer = require('../server');
 
 program.version(require('../package').version)
   .option('-d --db <file>', 'Path to the database.')
@@ -18,16 +21,12 @@ program.version(require('../package').version)
   .parse(process.argv);
 
 
-var config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
-
-if (program.avro) {
-  config.protocol = 'avro';
-}
+const config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
 
 if (config.configFile) {
   try {
-    var config_file = path.resolve(process.cwd(), config.configFile);
-    var doc = yaml.load(fs.readFileSync(config_file, 'utf8'));
+    const config_file = path.resolve(process.cwd(), config.configFile);
+    const doc = yaml.load(fs.readFileSync(config_file, 'utf8'));
     _.extend(config, doc);
   } catch (e) {
     console.error('Error loading configuration\n', e.stack);
@@ -37,30 +36,36 @@ if (config.configFile) {
   }
 }
 
-var server = new LimitdServer(config);
+if (typeof config.db === 'undefined') {
+  console.error('missing database path');
+  return process.exit(1);
+}
+
+const server = new LimitdServer(config);
 
 server.start();
 
 if (program.profile) {
-  var profiler = require('v8-profiler');
   profiler.startProfiling('1', true);
 }
 
 function finish () {
   if (program.profile) {
-    var profile1 = profiler.stopProfiling();
+    const profile1 = profiler.stopProfiling();
     return profile1.export(function(error, result) {
-      fs.writeFileSync(process.cwd() + '/profile.cpuprofile', result);
+      fs.writeFileSync(`${process.cwd()}/profile-${Date.now()}.cpuprofile`, result);
       profile1.delete();
       process.exit(0);
     });
   }
+
   server.stop(function () {
     process.exit(0);
   });
+
   setTimeout(function () {
     process.exit(0);
-  });
+  }, 1000);
 }
 
 process
