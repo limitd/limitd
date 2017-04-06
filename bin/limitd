@@ -8,6 +8,7 @@ const fs       = require('fs');
 const yaml     = require('js-yaml');
 const _        = require('lodash');
 const profiler = require('v8-profiler');
+const getLogger  = require('../lib/logger');
 
 const LimitdServer = require('../server');
 
@@ -35,6 +36,8 @@ if (config.configFile) {
     }, 500);
   }
 }
+
+const logger = getLogger(config.log_level);
 
 if (typeof config.db === 'undefined') {
   console.error('missing database path');
@@ -68,7 +71,24 @@ function finish () {
   }, 1000);
 }
 
+function createSnapshot () {
+  const path = `/tmp/limitd-${Math.floor(Date.now() / 1000)}.heapsnapshot`;
+
+  logger.info({ path: path }, 'starting snapshot');
+
+  const snapshot = profiler.takeSnapshot();
+
+  snapshot.export()
+    .pipe(fs.createWriteStream(path))
+    .on('finish', function () {
+      snapshot.delete();
+      fs.chmodSync(path, 0400);
+      logger.info({ path: path }, 'snapshot finished');
+    });
+}
+
 process
   .on('SIGTERM', finish)
-  .on('SIGINT', finish);
+  .on('SIGINT', finish)
+  .on('SIGUSR2', createSnapshot);
 
