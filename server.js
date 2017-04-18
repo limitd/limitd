@@ -72,6 +72,8 @@ function LimitdServer (options) {
     'METRICS_API_KEY': this._config.metrics_api_key,
     'ERROR_REPORTER_URL': this._config.error_reporter_url
   });
+
+  this._metrics = agent.metrics;
 }
 
 util.inherits(LimitdServer, EventEmitter);
@@ -108,6 +110,7 @@ LimitdServer.prototype._handler = function (socket) {
 
   const request_handler = new RequestHandler({
     logger: this._logger,
+    metrics: this._metrics,
     db: this._db,
   });
 
