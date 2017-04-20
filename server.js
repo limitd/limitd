@@ -73,6 +73,8 @@ function LimitdServer (options) {
     'ERROR_REPORTER_URL': this._config.error_reporter_url
   });
 
+  agent.metrics.startResourceCollection();
+
   this._metrics = agent.metrics;
 }
 
