@@ -9,6 +9,7 @@ const yaml     = require('js-yaml');
 const _        = require('lodash');
 const profiler = require('v8-profiler');
 const getLogger  = require('../lib/logger');
+const configEnvParser = require('../conf/config.env.parser');
 
 const LimitdServer = require('../server');
 
@@ -35,6 +36,16 @@ if (config.configFile) {
       process.exit(1);
     }, 500);
   }
+}
+
+try{
+  const parsed = configEnvParser.parse(process.env);
+  _.extend(config, parsed);
+} catch (e) {
+  console.error('Error parsing environment configuration\n', e.stack);
+  setTimeout(function () {
+    process.exit(2);
+  }, 500);
 }
 
 const logger = getLogger(config.log_level);
