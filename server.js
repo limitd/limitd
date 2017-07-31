@@ -82,6 +82,7 @@ util.inherits(LimitdServer, EventEmitter);
 
 LimitdServer.prototype._handler = function (socket) {
   socket.setNoDelay();
+  socket.setKeepAlive(true);
 
   const sockets_details = {
     remoteAddress: socket.remoteAddress,
