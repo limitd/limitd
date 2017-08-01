@@ -56,6 +56,7 @@ On other systems use node.js and npm:
 npm i -g limitd
 ```
 
+#### Configuration with a config file
 Create a file named `limitd.config` for the server settings:
 ```yaml
 #port to listen on
@@ -74,6 +75,34 @@ buckets:
 Start the server:
 ```bash
 limitd --config-file /etc/limitd.config
+```
+
+You can find all configuration options [below](#server_options).
+
+> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
+
+#### Configuration with environment variables
+```bash
+#port to listen on
+export PORT=9001
+
+#db path
+export DB=/var/limitd/database
+
+#define the bucket types
+export BUCKET_1_NAME=user
+export BUCKET_1_SIZE=10
+export BUCKET_1_PER_SECOND=5
+
+export BUCKET_2_NAME=some_other_bucket
+export BUCKET_2_SIZE=25
+export BUCKET_2_PER_MINUTE=15
+```
+> **Note**: Using enviroment variables for buckets has a limitation. The `override` config parameter is not supported yet.
+
+Start the server:
+```bash
+limitd
 ```
 
 You can find all configuration options [below](#server_options).
