@@ -142,7 +142,7 @@ The server configuration file uses [YAML](http://www.yaml.org/).
 * Description: Specifies the port to use to run the server. If not provided the default is `9231`.
 
 ### `db`
-* Type: `Number`
+* Type: `String`
 * Description: Specifies the path for the server database. This is a mandatory parameter.
 
 ### `buckets`
