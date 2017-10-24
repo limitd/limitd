@@ -118,8 +118,9 @@ LimitdServer.prototype._handler = function (socket) {
   });
 
   request_handler.once('error', (err) => {
-    log.error(_.extend(sockets_details, { err }), 'Error detected in the request pipeline.');
-    return socket.end();
+    const critical = err.message.indexOf('undefined bucket type') === -1;
+    log[critical ? 'error' : 'info'](_.extend(sockets_details, { err }), 'Error detected in the request pipeline.');
+    if (critical) { socket.end(); }
   });
 
   const encoder = new ResponseEncoder();
