@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const schema = require('./config.schema');
+const schema = require('../config.schema');
 const propertyNames = Object.keys(schema.properties);
 
 function parseString(name, value) {

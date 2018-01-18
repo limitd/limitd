@@ -3,14 +3,12 @@
 process.title = 'limitd server';
 
 const program  = require('commander');
-const path     = require('path');
 const fs       = require('fs');
-const yaml     = require('js-yaml');
 const _        = require('lodash');
 const profiler = require('v8-profiler');
 const getLogger  = require('../lib/logger');
-const configEnvParser = require('../conf/config.env.parser');
-
+const configEnvParser = require('../conf/parser/env');
+const configFileParser = require('../conf/parser/file');
 const LimitdServer = require('../server');
 
 program.version(require('../package').version)
@@ -27,11 +25,10 @@ const config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
 
 if (config.configFile) {
   try {
-    const config_file = path.resolve(process.cwd(), config.configFile);
-    const doc = yaml.load(fs.readFileSync(config_file, 'utf8'));
-    _.extend(config, doc);
+    const parsed = configFileParser.parse(config.configFile);
+    _.extend(config, parsed);
   } catch (e) {
-    console.error('Error loading configuration\n', e.stack);
+    console.error('Error parsing configuration from file\n', e.stack);
     setTimeout(function () {
       process.exit(1);
     }, 500);
