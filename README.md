@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/auth0/limitd.svg)](https://travis-ci.org/auth0/limitd)
+[![Build Status](https://travis-ci.org/limitd/limitd.svg?branch=master)](https://travis-ci.org/limitd/limitd)
 
 limitd is a simple daemon for rate limiting highly available applications.
 
