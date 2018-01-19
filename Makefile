@@ -10,9 +10,9 @@ build_deb: check-fpm-installed check-version-variable check-deb-variables
 	# WORKSPACE , GIT_URL , VERSION_NUMBER , GIT_BRANCH , GIT_COMMIT
 	#
 	#trick npm to avoid a commit in git
-	mv .git .git-back
-	npm version $(VERSION_NUMBER)
-	mv .git-back .git
+	# mv .git .git-back
+	# npm version $(VERSION_NUMBER)
+	# mv .git-back .git
 
 	find . -name ".npmignore" -o -name ".gitignore" -delete
 
@@ -26,7 +26,7 @@ build_deb: check-fpm-installed check-version-variable check-deb-variables
 	-d auth0-node-v$(NODE_VERSION)-linux-x64 \
 	-x '**/.git*' -x '*.tgz' -x '**/test/*' \
 	--description 'Jenkins build $(VERSION_NUMBER) - git commit $(GIT_BRANCH)-$(GIT_COMMIT)' \
-	-t deb -s dir limitd 
+	-t deb -s dir limitd
 
 	git checkout .
 
