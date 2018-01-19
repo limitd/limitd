@@ -25,8 +25,8 @@ const config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
 
 if (config.configFile) {
   try {
-    const parsed = configFileParser.parse(config.configFile);
-    _.extend(config, parsed);
+    const parsedFromFile = configFileParser.parse(config.configFile);
+    _.extend(config, parsedFromFile);
   } catch (e) {
     console.error('Error parsing configuration from file\n', e.stack);
     setTimeout(function () {
@@ -36,8 +36,8 @@ if (config.configFile) {
 }
 
 try{
-  const parsed = configEnvParser.parse(process.env);
-  _.extend(config, parsed);
+  const parsedFromEnv = configEnvParser.parse(process.env);
+  _.extend(config, parsedFromEnv);
 } catch (e) {
   console.error('Error parsing environment configuration\n', e.stack);
   setTimeout(function () {
