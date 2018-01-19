@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const parser = require('../conf/config.env.parser');
+const parser = require('../conf/parser/env');
 
 describe('config env parser', function() {
   describe('with a complete well formed environment', function () {

@@ -1,0 +1,8 @@
+log_level: debug
+
+buckets:
+  ip:
+    per_minute: 20
+
+  requests:
+    per_second: 100
