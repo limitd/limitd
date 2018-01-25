@@ -1,0 +1,5 @@
+#define the bucket types
+buckets:
+  user:
+    size: 5
+    per_second: 10

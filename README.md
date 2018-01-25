@@ -288,6 +288,22 @@ npm i
 npm test
 ```
 
+## Docker
+Running the tests:
+```
+npm run docker-test
+```
+
+Create image for production use. The `config` argument is mandatory and it should point to the limitd configuration file defining the buckets:
+```
+docker build --build-arg config={path-to-config} .
+```
+
+To run the image:
+```
+docker run -p 127.0.0.1:9231:9231 limitd 
+```
+
 ## Issue Reporting
 
 If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.

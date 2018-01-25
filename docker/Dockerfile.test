@@ -1,0 +1,20 @@
+FROM node:4-onbuild
+
+WORKDIR /app
+
+# Prep for running with non-root
+RUN useradd -ms /bin/bash limitd
+
+# limitd's default port
+EXPOSE 9231
+
+COPY package.json /app/
+RUN npm install
+
+COPY . /app/
+
+RUN chown -R limitd /app
+USER limitd
+
+# Don't use npm start to ensure it runs at PID=1
+CMD ["npm", "test"]
