@@ -79,24 +79,6 @@ function finish () {
   }, 1000);
 }
 
-function createSnapshot () {
-  const path = `/tmp/limitd-${Math.floor(Date.now() / 1000)}.heapsnapshot`;
-
-  logger.info({ path: path }, 'starting snapshot');
-
-  const snapshot = profiler.takeSnapshot();
-
-  snapshot.export()
-    .pipe(fs.createWriteStream(path))
-    .on('finish', function () {
-      snapshot.delete();
-      fs.chmodSync(path, 0400);
-      logger.info({ path: path }, 'snapshot finished');
-    });
-}
-
 process
   .on('SIGTERM', finish)
-  .on('SIGINT', finish)
-  .on('SIGUSR2', createSnapshot);
-
+  .on('SIGINT', finish);
