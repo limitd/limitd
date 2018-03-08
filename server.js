@@ -66,7 +66,7 @@ function LimitdServer (options) {
     types: this._config.buckets
   });
 
-  this._metrics = config.metrics;
+  this._metrics = this._config.metrics;
 }
 
 util.inherits(LimitdServer, EventEmitter);
