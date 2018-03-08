@@ -19,7 +19,11 @@ const enableDestroy = require('server-destroy');
 const defaults = {
   port:      9231,
   hostname:  '0.0.0.0',
-  log_level: 'info'
+  log_level: 'info',
+  metrics: {
+    histogram: function noop() {},
+    increment: function noop() {}
+  }
 };
 
 /*
