@@ -1,5 +1,10 @@
-language: node_js
-node_js:
-  - 4
-  - 6
-  - 8
+sudo: required
+
+services:
+  - docker
+
+before_script:
+  - docker build -t limitd .
+
+script:
+  - docker run limitd npm t
