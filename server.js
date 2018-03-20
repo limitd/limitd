@@ -14,14 +14,16 @@ const lps = require('length-prefixed-stream');
 
 const validateConfig = require('./lib/config_validator');
 
-const agent = require('auth0-instrumentation');
-
 const enableDestroy = require('server-destroy');
 
 const defaults = {
   port:      9231,
   hostname:  '0.0.0.0',
-  log_level: 'info'
+  log_level: 'info',
+  metrics: {
+    histogram: function noop() {},
+    increment: function noop() {}
+  }
 };
 
 /*
@@ -64,18 +66,7 @@ function LimitdServer (options) {
     types: this._config.buckets
   });
 
-  agent.init({
-    'name': 'limitd'
-  }, {
-    'COLLECT_RESOURCE_USAGE': true,
-    'STATSD_HOST': this._config.statsd_host,
-    'METRICS_API_KEY': this._config.metrics_api_key,
-    'ERROR_REPORTER_URL': this._config.error_reporter_url
-  });
-
-  agent.metrics.startResourceCollection();
-
-  this._metrics = agent.metrics;
+  this._metrics = this._config.metrics;
 }
 
 util.inherits(LimitdServer, EventEmitter);
