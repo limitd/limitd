@@ -5,12 +5,10 @@ process.title = 'limitd server';
 const program  = require('commander');
 const fs       = require('fs');
 const _        = require('lodash');
+const profiler = require('v8-profiler');
 const getLogger  = require('../lib/logger');
-const profiler = require('v8-profiler-node8');
-const agent = require('auth0-instrumentation');
 const configEnvParser = require('../conf/parser/env');
 const configFileParser = require('../conf/parser/file');
-
 const LimitdServer = require('../server');
 
 program.version(require('../package').version)
@@ -54,18 +52,6 @@ if (typeof config.db === 'undefined') {
   return process.exit(1);
 }
 
-agent.init({
-  'name': 'limitd'
-}, {
-  'COLLECT_RESOURCE_USAGE': true,
-  'STATSD_HOST': process.env.STATSD_HOST || config.statsd_host,
-  'ERROR_REPORTER_URL': process.env.ERROR_REPORTER_URL || config.error_reporter_url
-});
-
-agent.metrics.startResourceCollection();
-
-config.metrics = agent.metrics;
-
 const server = new LimitdServer(config);
 
 server.start();
@@ -93,6 +79,24 @@ function finish () {
   }, 1000);
 }
 
+function createSnapshot () {
+  const path = `/tmp/limitd-${Math.floor(Date.now() / 1000)}.heapsnapshot`;
+
+  logger.info({ path: path }, 'starting snapshot');
+
+  const snapshot = profiler.takeSnapshot();
+
+  snapshot.export()
+    .pipe(fs.createWriteStream(path))
+    .on('finish', function () {
+      snapshot.delete();
+      fs.chmodSync(path, 0400);
+      logger.info({ path: path }, 'snapshot finished');
+    });
+}
+
 process
   .on('SIGTERM', finish)
-  .on('SIGINT', finish);
+  .on('SIGINT', finish)
+  .on('SIGUSR2', createSnapshot);
+
