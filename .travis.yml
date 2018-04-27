@@ -8,3 +8,4 @@ before_script:
 
 script:
   - docker run limitd npm t
+  - docker run limitd npm run lint

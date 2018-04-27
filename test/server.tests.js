@@ -31,8 +31,8 @@ describe('limitd server', function () {
     });
   });
 
-  after(function () {
-    server.stop();
+  after(function (done) {
+    server.stop(done);
   });
 
   afterEach(function () {
@@ -238,7 +238,7 @@ describe('limitd server', function () {
     it('should restore the bucket when reseting', function (done) {
       client.take('ip', '211.123.12.12', function (err) {
         if (err) return done(err);
-        client.put('ip', '211.123.12.12', function (err, result) {
+        client.put('ip', '211.123.12.12', function (err) {
           if (err) return done(err);
           client.take('ip', '211.123.12.12', function (err, response) {
             if (err) return done(err);
@@ -250,7 +250,7 @@ describe('limitd server', function () {
     });
 
     it('should be able to reset without callback', function (done) {
-      client.take('ip', '211.123.5.12', function (err, response) {
+      client.take('ip', '211.123.5.12', function (err) {
         if (err) return done(err);
 
         client.put('ip', '211.123.5.12', 1);
@@ -403,6 +403,7 @@ describe('limitd server', function () {
     });
 
   });
+
 });
 
 

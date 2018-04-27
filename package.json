@@ -8,6 +8,7 @@
     "url": "http://github.com/auth0/limitd.git"
   },
   "scripts": {
+    "lint": "jshint --exclude ./node_modules .",
     "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --exit",
     "perf": "node perf/index.js"
   },
@@ -23,11 +24,12 @@
     "async": "^2.6.0",
     "auth0-instrumentation": "github:auth0/auth0-instrumentation#v2.11.4",
     "bunyan": "^1.8.12",
+    "cb": "^0.1.0",
     "commander": "~2.15.0",
     "js-yaml": "~3.11.0",
     "length-prefixed-stream": "~1.5.1",
     "limitd-protocol": "limitd/protocol#v2.0.5",
-    "limitdb": "^2.3.2",
+    "limitdb": "^2",
     "lodash": "~4.17.5",
     "readable-stream": "^2.3.5",
     "reconnect-net": "1.1.1",
@@ -42,6 +44,7 @@
     "chai": "~4.1.2",
     "cli-table": "~0.3.1",
     "fast-stats": "0.0.3",
+    "jshint": "^2.9.5",
     "limitd-client": "^2.13.2",
     "mocha": "~5.0.4",
     "mockdate": "~2.0.2",

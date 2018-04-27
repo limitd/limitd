@@ -1,6 +1,3 @@
-const rdy = require('rdy');
-const countn = require('countn');
-const async = require('neo-async');
 const _ = require('lodash');
 const start = process.hrtime();
 const fixture = _.range(1e5);
