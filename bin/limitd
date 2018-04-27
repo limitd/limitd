@@ -84,13 +84,9 @@ function finish () {
     });
   }
 
-  server.stop(function () {
-    process.exit(0);
+  server.stop((err) => {
+    process.exit(err ? 1 : 0);
   });
-
-  setTimeout(function () {
-    process.exit(0);
-  }, 1000);
 }
 
 process

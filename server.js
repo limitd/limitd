@@ -1,6 +1,7 @@
 const EventEmitter = require('events').EventEmitter;
 
 const util    = require('util');
+const cb = require('cb');
 const logger  = require('./lib/logger');
 const _       = require('lodash');
 const net     = require('net');
@@ -149,15 +150,35 @@ LimitdServer.prototype.start = function (done) {
   return this;
 };
 
-LimitdServer.prototype.stop = function () {
+LimitdServer.prototype.stop = function (callback) {
   var self = this;
   var log = self._logger;
   var address = self._server.address();
+  callback = cb(callback || _.noop).timeout(5000).once();
+  log.debug(address, 'closing server');
 
-  this._server.destroy(function() {
-    log.debug(address, 'server closed');
-    self.emit('close');
+  this._server.destroy((serverCloseError) => {
+    if (serverCloseError) {
+      log.error({
+        err: serverCloseError,
+        address
+      }, 'error closing the tcp server');
+    } else {
+      log.debug({ address }, 'server closed');
+    }
+    this._db.close(dbCloseError => {
+      if (dbCloseError) {
+        log.error({
+          err: dbCloseError
+        }, 'error closing the database');
+      } else {
+        log.debug('database closed');
+      }
+      self.emit('close');
+      return callback(serverCloseError || dbCloseError);
+    });
   });
+
 };
 
 

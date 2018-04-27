@@ -40,6 +40,6 @@ app.get('/throttled', function (req, res, next) {
 });
 
 
-http.createServer(app).listen(9000, function (err) {
+http.createServer(app).listen(9000, function () {
   console.log('listening on http://localhost:9000');
 });

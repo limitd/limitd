@@ -29,8 +29,8 @@ describe('wrong requests', function () {
     });
   });
 
-  after(function () {
-    server.stop();
+  after(function (done) {
+    server.stop(done);
   });
 
   it('should disconnect the socket on unknown message', function (done) {
