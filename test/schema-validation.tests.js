@@ -39,6 +39,20 @@ describe('schema validation', function() {
     expect(err).to.be.null;
   });
 
+  it('should not return an error if inMemory is provided', function() {
+    var err = validate({
+      db: {
+        inMemory: true
+      },
+      buckets: {
+        ip: {
+          size: 1
+        }
+      }
+    });
+    expect(err).to.be.null;
+  });
+
   it('should return an error if log_level is invalid', function() {
     var err = validate({
       db: '/tmp/limitd.db',

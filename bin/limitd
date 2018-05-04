@@ -3,9 +3,10 @@
 process.title = 'limitd server';
 
 const program  = require('commander');
-const fs       = require('fs');
-const _        = require('lodash');
-const getLogger  = require('../lib/logger');
+const fs = require('fs');
+const _ = require('lodash');
+const getLogger = require('../lib/logger');
+const getEventLogger = require('../lib/eventLogger');
 const profiler = require('v8-profiler-node8');
 const agent = require('auth0-instrumentation');
 const configEnvParser = require('../conf/parser/env');
@@ -21,7 +22,6 @@ program.version(require('../package').version)
   .option('--avro', 'Use the avro protocol.')
   .option('--profile')
   .parse(process.argv);
-
 
 const config = _.pick(program, ['db', 'port', 'hostname', 'configFile']);
 
@@ -48,6 +48,8 @@ try{
 }
 
 const logger = getLogger(config.log_level);
+const eventLogger = getEventLogger(logger);
+eventLogger.watch(process);
 
 if (typeof config.db === 'undefined') {
   console.error('missing database path');
