@@ -62,10 +62,22 @@ function LimitdServer (options) {
     self.emit('error', err);
   });
 
-  this._db = new LimitDB({
-    path: typeof this._config.db === 'string' ? this._config.db : this._config.db.path,
-    types: this._config.buckets
-  });
+  var dbConfig = { types: this._config.buckets };
+
+  if (typeof this._config.db === 'string') {
+    dbConfig.path = this._config.db;
+  } else if(typeof this._config.db === 'object') {
+    Object.assign(dbConfig, this._config.db);
+  }
+
+  this._db = new LimitDB(dbConfig);
+
+  this._db
+    .on('ready', () => this._logger.info({ path: dbConfig.path }, 'Database ready.'))
+    .on('error', err => this.emit('error', err))
+    .on('repairing', () => {
+      this._logger.info({ path: dbConfig.path }, 'Repairing database.');
+    });
 
   this._metrics = this._config.metrics;
 }
@@ -129,6 +141,10 @@ LimitdServer.prototype.start = function (done) {
   var self = this;
   var log = self._logger;
 
+  if (!this._db.isOpen()) {
+    return this._db.once('ready', () => this.start(done));
+  }
+
   self._server.listen(this._config.port, this._config.hostname, function(err) {
     if (err) {
       log.error(err, 'error starting server');
@@ -140,7 +156,7 @@ LimitdServer.prototype.start = function (done) {
     }
 
     var address = self._server.address();
-    log.debug(address, 'server started');
+    log.info(address, 'server started');
     self.emit('started', address);
     if (done) {
       done(null, address);

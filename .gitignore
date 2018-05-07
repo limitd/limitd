@@ -40,3 +40,4 @@ code.asm
 perf/db
 
 *.orig
+.vscode
