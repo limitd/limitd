@@ -22,8 +22,7 @@
   },
   "dependencies": {
     "async": "^2.6.0",
-    "auth0-instrumentation": "github:auth0/auth0-instrumentation#v2.11.4",
-    "bunyan": "^1.8.12",
+    "auth0-instrumentation": "auth0/auth0-instrumentation#v2.13.0",
     "cb": "^0.1.0",
     "commander": "~2.15.0",
     "js-yaml": "~3.11.0",
