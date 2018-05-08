@@ -70,6 +70,9 @@ module.exports = {
       enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace'],
       description: 'the verbosity of the logs (defaults to "info")',
     },
+    log_file: {
+      description: 'log to a file instead of stdout'
+    },
     buckets: {
       type: 'object',
       description: 'The configuration for all bucket types',

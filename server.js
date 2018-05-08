@@ -2,11 +2,11 @@ const EventEmitter = require('events').EventEmitter;
 
 const util    = require('util');
 const cb = require('cb');
-const logger  = require('./lib/logger');
 const _       = require('lodash');
 const net     = require('net');
 const LimitDB = require('limitdb');
-
+const agent   = require('./lib/agent');
+const logger  = agent.logger;
 const RequestHandler  = require('./lib/pipeline/RequestHandler');
 const RequestDecoder  = require('./lib/pipeline/RequestDecoder');
 const ResponseEncoder = require('./lib/pipeline/ResponseEncoder');
@@ -54,7 +54,6 @@ function LimitdServer (options) {
     throw new Error(configError);
   }
 
-  this._logger = logger(this._config.log_level);
   this._server = net.createServer(this._handler.bind(this));
   enableDestroy(this._server);
 
@@ -73,10 +72,10 @@ function LimitdServer (options) {
   this._db = new LimitDB(dbConfig);
 
   this._db
-    .on('ready', () => this._logger.info({ path: dbConfig.path }, 'Database ready.'))
+    .on('ready', () => logger.info({ path: dbConfig.path }, 'Database ready.'))
     .on('error', err => this.emit('error', err))
     .on('repairing', () => {
-      this._logger.info({ path: dbConfig.path }, 'Repairing database.');
+      logger.info({ path: dbConfig.path }, 'Repairing database.');
     });
 
   this._metrics = this._config.metrics;
@@ -93,37 +92,34 @@ LimitdServer.prototype._handler = function (socket) {
     remotePort: socket.remotePort
   };
 
-  const log = this._logger;
-
   socket.on('error', function (err) {
-    log.debug(_.extend(sockets_details, {
+    logger.debug(_.extend(sockets_details, {
       err: {
         code:    err.code,
         message: err.message
       }
     }), 'connection error');
   }).on('close', function () {
-    log.debug(sockets_details, 'connection closed');
+    logger.debug(sockets_details, 'connection closed');
   });
 
-  log.debug(sockets_details, 'connection accepted');
+  logger.debug(sockets_details, 'connection accepted');
 
   const decoder = new RequestDecoder();
 
   decoder.on('error', function (err) {
-    log.error(_.extend(sockets_details, { err }), 'Error detected in the request pipeline.');
+    logger.error(_.extend(sockets_details, { err }), 'Error detected in the request pipeline.');
     return socket.end();
   });
 
   const request_handler = new RequestHandler({
-    logger: this._logger,
     metrics: this._metrics,
     db: this._db,
   });
 
   request_handler.once('error', (err) => {
     const critical = err.message.indexOf('undefined bucket type') === -1;
-    log[critical ? 'error' : 'info'](_.extend(sockets_details, { err }), 'Error detected in the request pipeline.');
+    logger[critical ? 'error' : 'info'](_.extend(sockets_details, { err }), 'Error detected in the request pipeline.');
     if (critical) { socket.end(); }
   });
 
@@ -139,7 +135,6 @@ LimitdServer.prototype._handler = function (socket) {
 
 LimitdServer.prototype.start = function (done) {
   var self = this;
-  var log = self._logger;
 
   if (!this._db.isOpen()) {
     return this._db.once('ready', () => this.start(done));
@@ -147,7 +142,7 @@ LimitdServer.prototype.start = function (done) {
 
   self._server.listen(this._config.port, this._config.hostname, function(err) {
     if (err) {
-      log.error(err, 'error starting server');
+      logger.error(err, 'error starting server');
       self.emit('error', err);
       if (done) {
         done(err);
@@ -156,7 +151,7 @@ LimitdServer.prototype.start = function (done) {
     }
 
     var address = self._server.address();
-    log.info(address, 'server started');
+    logger.info(address, 'server started');
     self.emit('started', address);
     if (done) {
       done(null, address);
@@ -168,27 +163,26 @@ LimitdServer.prototype.start = function (done) {
 
 LimitdServer.prototype.stop = function (callback) {
   var self = this;
-  var log = self._logger;
   var address = self._server.address();
   callback = cb(callback || _.noop).timeout(5000).once();
-  log.debug(address, 'closing server');
+  logger.debug(address, 'closing server');
 
   this._server.destroy((serverCloseError) => {
     if (serverCloseError) {
-      log.error({
+      logger.error({
         err: serverCloseError,
         address
       }, 'error closing the tcp server');
     } else {
-      log.debug({ address }, 'server closed');
+      logger.debug({ address }, 'server closed');
     }
     this._db.close(dbCloseError => {
       if (dbCloseError) {
-        log.error({
+        logger.error({
           err: dbCloseError
         }, 'error closing the database');
       } else {
-        log.debug('database closed');
+        logger.debug('database closed');
       }
       self.emit('close');
       return callback(serverCloseError || dbCloseError);
