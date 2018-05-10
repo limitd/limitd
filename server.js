@@ -20,11 +20,7 @@ const enableDestroy = require('server-destroy');
 const defaults = {
   port:      9231,
   hostname:  '0.0.0.0',
-  log_level: 'info',
-  metrics: {
-    histogram: function noop() {},
-    increment: function noop() {}
-  }
+  log_level: 'info'
 };
 
 /*
@@ -36,7 +32,6 @@ const defaults = {
  *  - `port` the port to listen to. Defaults to 9231.
  *  - `hostname` the hostname to bind to. Defaults to INADDR_ANY
  *  - `log_level` the verbosity of the logs. Defaults to 'info'.
- *  - `metrics_api_key`, the DataDog api key to log metrics to. Defaults to undefined.
  *
  */
 function LimitdServer (options) {
@@ -77,8 +72,6 @@ function LimitdServer (options) {
     .on('repairing', () => {
       logger.info({ path: dbConfig.path }, 'Repairing database.');
     });
-
-  this._metrics = this._config.metrics;
 }
 
 util.inherits(LimitdServer, EventEmitter);
@@ -113,7 +106,6 @@ LimitdServer.prototype._handler = function (socket) {
   });
 
   const request_handler = new RequestHandler({
-    metrics: this._metrics,
     db: this._db,
   });
 
