@@ -5,7 +5,7 @@ const configFileParser = require('../conf/parser/file');
 const download = function(url, dest, etagDest, timeout, cb) {
   try {
     fs.unlink(dest, function(err) {
-      if(err && err.code != 'ENOENT') {
+      if(err && err.code !== 'ENOENT') {
         // couldn't remove the file
         return cb(err);
       }
@@ -29,7 +29,7 @@ const download = function(url, dest, etagDest, timeout, cb) {
             lastEtag = fs.readFileSync(etagDest, { encoding: 'utf8' });
           } catch(e) {}
 
-          if (lastEtag == response.headers['etag']) {
+          if (lastEtag === response.headers['etag']) {
             return file.close(function() {
               cb(null, true);
             });
@@ -69,5 +69,5 @@ module.exports.fetchRemoteConfiguration = function(config, cb) {
     } catch (e) {
       return cb(e);
     }
-  })
+  });
 };

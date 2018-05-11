@@ -40,7 +40,7 @@ describe('config file fetcher', function() {
       .get('/mylimit.config')
       .reply(200, remoteConfigFile);
 
-    fs.writeFileSync('/tmp/should-not-change', remoteConfigFile, { encoding: 'utf8' })
+    fs.writeFileSync('/tmp/should-not-change', remoteConfigFile, { encoding: 'utf8' });
     fs.writeFileSync('/tmp/should-not-change.etag', '123', { encoding: 'utf8' });
 
     fetcher.fetchRemoteConfiguration({
@@ -81,7 +81,7 @@ describe('config file fetcher', function() {
       .get('/mylimit.config')
       .reply(200, remoteConfigFile);
 
-    fs.writeFileSync('/tmp/should-change', remoteConfigFile, { encoding: 'utf8' })
+    fs.writeFileSync('/tmp/should-change', remoteConfigFile, { encoding: 'utf8' });
     fs.writeFileSync('/tmp/should-change.etag', '1233', { encoding: 'utf8' });
 
     fetcher.fetchRemoteConfiguration({

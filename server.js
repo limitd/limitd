@@ -63,7 +63,7 @@ function LimitdServer (options) {
 
   if (this._config.remoteConfigURI) {
     setInterval(function() {
-      logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Trying to fetch configuration from remote location')
+      logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Trying to fetch configuration from remote location');
       configFetcher.fetchRemoteConfiguration(self._config, function(err, config) {
         if (err) return logger.error({ err: err, remoteConfigURI: self._config.remoteConfigURI }, 'Error fetching configuration from remote location');
         if (config && config.buckets) {
