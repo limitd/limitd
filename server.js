@@ -67,11 +67,12 @@ function LimitdServer (options) {
       configFetcher.fetchRemoteConfiguration(self._config, function(err, config) {
         if (err) return logger.error({ err: err, remoteConfigURI: self._config.remoteConfigURI }, 'Error fetching configuration from remote location');
         if (config && config.buckets) {
-          logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Successfully fetched new configuration. Reloading...')
-          self._db.close(function() {
+          logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Successfully fetched new configuration. Reloading...');
+          return self._db.close(function() {
             self._reloadDB({ types: config.buckets });
           });
         }
+        logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Nothing changed in the config from the remote location');
       });
     }, this._config.remoteConfigInterval || 60 * 1000);
   }
@@ -86,6 +87,11 @@ LimitdServer.prototype._reloadDB = function(dbConfig) {
     dbConfig.path = this._config.db;
   } else if(typeof this._config.db === 'object') {
     Object.assign(dbConfig, this._config.db);
+  }
+
+  var configError = validateConfig(this._config);
+  if (configError) {
+    logger.error({ err: configError }, 'Error trying to reload configuration');
   }
 
   this._db = new LimitDB(dbConfig);

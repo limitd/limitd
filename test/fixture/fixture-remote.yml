@@ -1,0 +1,41 @@
+port: 19001
+
+log_level: error
+
+buckets:
+  ip:
+    size: 20
+    per_second: 5
+    override:
+      0.0.0.0:
+        size: 100
+        unlimited: true
+
+      127.0.0.1:
+        size: 1000
+        per_second: 500
+
+      10.0.0.1:
+        size: 1
+        per_hour: 2
+
+      with regexp:
+        size: 1000
+        per_second: 500
+        match: !!js/regexp /^127\./i
+
+      with regexp2:
+        size: 1000
+        per_second: 500
+        until: !!timestamp 2010-11-18
+        match: !!js/regexp /^10\./i
+
+  wrong_password:
+    size: 3
+    override:
+      dudu:
+        match: !!js/regexp /dudu.*/i
+        size: 2
+
+  once per hour:
+    per_hour: 1
