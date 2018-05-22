@@ -86,14 +86,14 @@ LimitdServer.prototype._handler = function (socket) {
   };
 
   socket.on('error', function (err) {
-    logger.debug(_.extend(sockets_details, {
+    logger.error(_.extend(sockets_details, {
       err: {
         code:    err.code,
         message: err.message
       }
     }), 'connection error');
   }).on('close', function () {
-    logger.debug(sockets_details, 'connection closed');
+    logger.info(sockets_details, 'connection closed');
   });
 
   logger.debug(sockets_details, 'connection accepted');
