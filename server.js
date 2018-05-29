@@ -86,7 +86,7 @@ LimitdServer.prototype._handler = function (socket) {
   };
 
   socket.on('error', function (err) {
-    logger.error(_.extend(sockets_details, {
+    logger.info(_.extend(sockets_details, {
       err: {
         code:    err.code,
         message: err.message
