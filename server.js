@@ -157,7 +157,7 @@ LimitdServer.prototype.stop = function (callback) {
   var self = this;
   var address = self._server.address();
   callback = cb(callback || _.noop).timeout(5000).once();
-  logger.debug(address, 'closing server');
+  logger.info(address, 'closing server');
 
   this._server.destroy((serverCloseError) => {
     if (serverCloseError) {
@@ -174,7 +174,7 @@ LimitdServer.prototype.stop = function (callback) {
           err: dbCloseError
         }, 'error closing the database');
       } else {
-        logger.debug('database closed');
+        logger.info('database closed');
       }
       self.emit('close');
       return callback(serverCloseError || dbCloseError);
