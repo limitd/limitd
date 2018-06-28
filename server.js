@@ -10,6 +10,7 @@ const logger  = agent.logger;
 const RequestHandler  = require('./lib/pipeline/RequestHandler');
 const RequestDecoder  = require('./lib/pipeline/RequestDecoder');
 const ResponseEncoder = require('./lib/pipeline/ResponseEncoder');
+const configFetcher = require('./conf/fetcher');
 
 const lps = require('length-prefixed-stream');
 
@@ -58,10 +59,39 @@ function LimitdServer (options) {
 
   var dbConfig = { types: this._config.buckets };
 
+  this._reloadDB(dbConfig);
+
+  if (this._config.remoteConfigURI) {
+    setInterval(function() {
+      logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Trying to fetch configuration from remote location');
+      configFetcher.fetchRemoteConfiguration(self._config, function(err, config) {
+        if (err) return logger.error({ err: err, remoteConfigURI: self._config.remoteConfigURI }, 'Error fetching configuration from remote location');
+        if (config && config.buckets) {
+          logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Successfully fetched new configuration. Reloading...');
+          return self._db.close(function() {
+            self._reloadDB({ types: config.buckets });
+          });
+        }
+        logger.info({ remoteConfigURI: self._config.remoteConfigURI }, 'Nothing changed in the config from the remote location');
+      });
+    }, this._config.remoteConfigInterval || 60 * 1000);
+  }
+
+  this._metrics = this._config.metrics;
+}
+
+util.inherits(LimitdServer, EventEmitter);
+
+LimitdServer.prototype._reloadDB = function(dbConfig) {
   if (typeof this._config.db === 'string') {
     dbConfig.path = this._config.db;
   } else if(typeof this._config.db === 'object') {
     Object.assign(dbConfig, this._config.db);
+  }
+
+  var configError = validateConfig(this._config);
+  if (configError) {
+    logger.error({ err: configError }, 'Error trying to reload configuration');
   }
 
   this._db = new LimitDB(dbConfig);
@@ -72,9 +102,7 @@ function LimitdServer (options) {
     .on('repairing', () => {
       logger.info({ path: dbConfig.path }, 'Repairing database.');
     });
-}
-
-util.inherits(LimitdServer, EventEmitter);
+};
 
 LimitdServer.prototype._handler = function (socket) {
   socket.setNoDelay();
