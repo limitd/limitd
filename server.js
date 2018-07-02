@@ -36,8 +36,6 @@ const defaults = {
  */
 function LimitdServer (options) {
   EventEmitter.call(this);
-  var self = this;
-
 
   if (!options.db) {
     throw new TypeError('"db" is required');
@@ -52,8 +50,8 @@ function LimitdServer (options) {
   this._server = net.createServer(this._handler.bind(this));
   enableDestroy(this._server);
 
-  this._server.on('error', function (err) {
-    self.emit('error', err);
+  this._server.on('error', (err) => {
+    this.emit('error', err);
   });
 
   var dbConfig = { types: this._config.buckets };
@@ -65,7 +63,6 @@ function LimitdServer (options) {
   }
 
   this._db = new LimitDB(dbConfig);
-
   this._db
     .on('ready', () => logger.info({ path: dbConfig.path }, 'Database ready.'))
     .on('error', err => this.emit('error', err))
@@ -126,25 +123,24 @@ LimitdServer.prototype._handler = function (socket) {
 };
 
 LimitdServer.prototype.start = function (done) {
-  var self = this;
 
   if (!this._db.isOpen()) {
     return this._db.once('ready', () => this.start(done));
   }
 
-  self._server.listen(this._config.port, this._config.hostname, function(err) {
+  this._server.listen(this._config.port, this._config.hostname, (err) => {
     if (err) {
       logger.error(err, 'error starting server');
-      self.emit('error', err);
+      this.emit('error', err);
       if (done) {
         done(err);
       }
       return;
     }
 
-    var address = self._server.address();
+    var address = this._server.address();
     logger.info(address, 'server started');
-    self.emit('started', address);
+    this.emit('started', address);
     if (done) {
       done(null, address);
     }
@@ -154,8 +150,7 @@ LimitdServer.prototype.start = function (done) {
 };
 
 LimitdServer.prototype.stop = function (callback) {
-  var self = this;
-  var address = self._server.address();
+  var address = this._server.address();
   callback = cb(callback || _.noop).timeout(5000).once();
   logger.info(address, 'closing server');
 
@@ -168,7 +163,7 @@ LimitdServer.prototype.stop = function (callback) {
     } else {
       logger.debug({ address }, 'server closed');
     }
-    this._db.close(dbCloseError => {
+    this._db.close((dbCloseError) => {
       if (dbCloseError) {
         logger.error({
           err: dbCloseError
@@ -176,13 +171,14 @@ LimitdServer.prototype.stop = function (callback) {
       } else {
         logger.info('database closed');
       }
-      self.emit('close');
+      this.emit('close');
       return callback(serverCloseError || dbCloseError);
     });
   });
-
 };
 
+LimitdServer.prototype.updateBucketConfig = function (buckets) {
+  this._db.loadTypes(buckets);
+};
 
 module.exports = LimitdServer;
-

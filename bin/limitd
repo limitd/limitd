@@ -3,10 +3,27 @@
 process.title = 'limitd server';
 
 const config = require('../conf');
+
+const agent = require('../lib/agent');
+const logger = agent.logger;
+const metrics = agent.metrics;
+const configurator = require('../lib/configurator');
+
 const LimitdServer = require('../server');
 const server = new LimitdServer(config);
 
+
 server.start();
+
+server.on('started', () => {
+  if (config.configurator) {
+    config.configurator.metrics = metrics;
+    config.configurator.logger = logger;
+    config.configurator.currentVal = config.buckets;
+    const configurator = new Configurator(config.configurator);
+    configurator.on('changed', server.updateBucketConfig.bind(server));
+  }
+});
 
 function finish () {
   server.stop((err) => {
@@ -16,4 +33,8 @@ function finish () {
 
 process
   .on('SIGTERM', finish)
-  .on('SIGINT', finish);
+  .on('SIGINT', finish)
+  .on('uncaughtException', (err) => {
+    logger.error(err);
+    finish();
+  });
