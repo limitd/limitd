@@ -56,7 +56,7 @@ describe('Configurator', function() {
           }
         }
       });
-      c.on('changed', (hash) => {
+      c.once('changed', (hash) => {
         assert.exists(hash);
         done();
       });
@@ -69,6 +69,7 @@ describe('Configurator', function() {
       const c = new Configurator({ store: {}, currentVal: 'test' });
       c.pollInterval = 30;
       c.checkForChanges = function() {
+        clearInterval(c.scheduledInterval);
         done();
       };
       c.startPolling();

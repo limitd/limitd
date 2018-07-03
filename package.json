@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lint": "jshint --exclude ./node_modules .",
-    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --exit",
+    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --recursive --exit",
     "perf": "node perf/index.js"
   },
   "bin": {

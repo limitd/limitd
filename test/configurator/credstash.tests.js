@@ -5,12 +5,12 @@ describe('CredstashStore', function() {
   describe('#constructor', function() {
     it('should throw when .table is missing', function() {
       assert.throws(function() {
-        new CStore({})
+        new CStore({});
       }, 'CredstashStore: table required');
     });
     it('should throw when .key is missing', function() {
       assert.throws(function() {
-        new CStore({table: 'test'})
+        new CStore({table: 'test'});
       }, 'CredstashStore: key required');
     });
   });
@@ -22,7 +22,7 @@ describe('CredstashStore', function() {
         getSecret: (params, cb) => {
           return cb(new Error());
         }
-      }
+      };
       c.fetch((err) => {
         assert.exists(err);
         done();
@@ -34,7 +34,7 @@ describe('CredstashStore', function() {
         getSecret: (params, cb) => {
           return cb(null, {'test': 'value'});
         }
-      }
+      };
       c.fetch((err, data) => {
         assert.isNull(err);
         assert.equal(data, 'value');
