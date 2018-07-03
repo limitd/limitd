@@ -8,7 +8,7 @@ const yaml = require('js-yaml');
 const agent = require('../lib/agent');
 const logger = agent.logger;
 const metrics = agent.metrics;
-const configurator = require('../lib/configurator');
+const Configurator = require('../lib/configurator');
 
 const LimitdServer = require('../server');
 const server = new LimitdServer(config);
@@ -23,7 +23,9 @@ server.on('started', () => {
     const configurator = new Configurator(config.configurator);
     configurator.on('changed', (data) => {
       const buckets = yaml.load(data);
+      const start = Date.now();
       server.updateBucketConfig(buckets);
+      logger.info('updated bucket configuration', { took: Date.now() - start });
     });
   }
 });
