@@ -73,6 +73,11 @@ module.exports = {
     log_file: {
       description: 'log to a file instead of stdout'
     },
+    collect_resource_usage: {
+      type: 'boolean',
+      default: false,
+      description: 'Collect CPU, eventloop and memory usage'
+    },
     buckets: {
       type: 'object',
       description: 'The configuration for all bucket types',

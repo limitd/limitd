@@ -86,14 +86,14 @@ LimitdServer.prototype._handler = function (socket) {
   };
 
   socket.on('error', function (err) {
-    logger.debug(_.extend(sockets_details, {
+    logger.info(_.extend(sockets_details, {
       err: {
         code:    err.code,
         message: err.message
       }
     }), 'connection error');
   }).on('close', function () {
-    logger.debug(sockets_details, 'connection closed');
+    logger.info(sockets_details, 'connection closed');
   });
 
   logger.debug(sockets_details, 'connection accepted');
@@ -157,7 +157,7 @@ LimitdServer.prototype.stop = function (callback) {
   var self = this;
   var address = self._server.address();
   callback = cb(callback || _.noop).timeout(5000).once();
-  logger.debug(address, 'closing server');
+  logger.info(address, 'closing server');
 
   this._server.destroy((serverCloseError) => {
     if (serverCloseError) {
@@ -174,7 +174,7 @@ LimitdServer.prototype.stop = function (callback) {
           err: dbCloseError
         }, 'error closing the database');
       } else {
-        logger.debug('database closed');
+        logger.info('database closed');
       }
       self.emit('close');
       return callback(serverCloseError || dbCloseError);
