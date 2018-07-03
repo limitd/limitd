@@ -3,6 +3,7 @@
 process.title = 'limitd server';
 
 const config = require('../conf');
+const yaml = require('js-yaml');
 
 const agent = require('../lib/agent');
 const logger = agent.logger;
@@ -12,7 +13,6 @@ const configurator = require('../lib/configurator');
 const LimitdServer = require('../server');
 const server = new LimitdServer(config);
 
-
 server.start();
 
 server.on('started', () => {
@@ -21,7 +21,10 @@ server.on('started', () => {
     config.configurator.logger = logger;
     config.configurator.currentVal = config.buckets;
     const configurator = new Configurator(config.configurator);
-    configurator.on('changed', server.updateBucketConfig.bind(server));
+    configurator.on('changed', (data) => {
+      const buckets = yaml.load(data);
+      server.updateBucketConfig(buckets);
+    });
   }
 });
 
