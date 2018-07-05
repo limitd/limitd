@@ -304,6 +304,30 @@ describe('limitd server', function () {
         });
       });
     });
+
+    it('should work after a fire and forget call', function (done) {
+      client.reset('wrong_password', 'dudu2');
+      client.take('wrong_password', 'dudu2', function (err, response) {
+        assert.ok(response.conformant);
+        client.reset('wrong_password', 'dudu2', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.remaining, 2);
+          done();
+        });
+      });
+    });
+
+    it('should work after a fire and forget call with unknown bucket', function (done) {
+      client.reset('unknown_bucket', 'dudu2');
+      client.take('wrong_password', 'dudu2', function (err, response) {
+        assert.ok(response.conformant);
+        client.reset('wrong_password', 'dudu2', function (err, response) {
+          if (err) return done(err);
+          assert.equal(response.remaining, 2);
+          done();
+        });
+      });
+    });
   });
 
   describe('ping', function () {
