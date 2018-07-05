@@ -23,12 +23,15 @@ server.on('started', () => {
     const configurator = new Configurator(config.configurator);
     configurator.on('changed', (data) => {
       try {
-        const buckets = yaml.load(data);
+        data = yaml.load(data);
       } catch(err) {
-        return logger.error('invalid bucket configuration', err);
+        return logger.error('invalid configuration', err);
+      }
+      if (data.buckets == null) {
+        return logger.error('missing bucket configuration');
       }
       const start = Date.now();
-      server.updateBucketConfig(buckets);
+      server.updateBucketConfig(data.buckets);
       logger.info('updated bucket configuration', { took: Date.now() - start });
     });
   }

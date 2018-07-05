@@ -177,8 +177,8 @@ LimitdServer.prototype.stop = function (callback) {
   });
 };
 
-LimitdServer.prototype.updateBucketConfig = function (config) {
-  this._db.loadTypes(config.buckets);
+LimitdServer.prototype.updateTypes = function (types) {
+  this._db.loadTypes(types);
 };
 
 module.exports = LimitdServer;
