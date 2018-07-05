@@ -1,22 +1,21 @@
-const EventEmitter = require('events').EventEmitter;
 
-const util    = require('util');
 const cb = require('cb');
-const _       = require('lodash');
-const net     = require('net');
+const net = require('net');
+const util = require('util');
+const _  = require('lodash');
 const LimitDB = require('limitdb');
-const agent   = require('./lib/agent');
-const logger  = agent.logger;
+const agent = require('./lib/agent');
+const lps = require('length-prefixed-stream');
+const enableDestroy = require('server-destroy');
+const EventEmitter = require('events').EventEmitter;
+const validateConfig = require('./lib/config_validator');
 const RequestHandler  = require('./lib/pipeline/RequestHandler');
 const RequestDecoder  = require('./lib/pipeline/RequestDecoder');
 const ResponseEncoder = require('./lib/pipeline/ResponseEncoder');
 const stream = require('stream');
 
-const lps = require('length-prefixed-stream');
 
-const validateConfig = require('./lib/config_validator');
-
-const enableDestroy = require('server-destroy');
+const logger  = agent.logger;
 
 const defaults = {
   port:      9231,
@@ -37,8 +36,6 @@ const defaults = {
  */
 function LimitdServer (options) {
   EventEmitter.call(this);
-  var self = this;
-
 
   if (!options.db) {
     throw new TypeError('"db" is required');
@@ -53,23 +50,26 @@ function LimitdServer (options) {
   this._server = net.createServer(this._handler.bind(this));
   enableDestroy(this._server);
 
-  this._server.on('error', function (err) {
-    self.emit('error', err);
+  this._server.on('error', (err) => {
+    this.emit('error', err);
   });
 
-  var dbConfig = { types: this._config.buckets };
+  const dbConfig = { types: this._config.buckets };
 
   if (typeof this._config.db === 'string') {
     dbConfig.path = this._config.db;
-  } else if(typeof this._config.db === 'object') {
+  } else if (typeof this._config.db === 'object') {
     Object.assign(dbConfig, this._config.db);
   }
 
   this._db = new LimitDB(dbConfig);
-
   this._db
-    .on('ready', () => logger.info({ path: dbConfig.path }, 'Database ready.'))
-    .on('error', err => this.emit('error', err))
+    .on('ready', () => {
+      logger.info({ path: dbConfig.path }, 'Database ready.');
+    })
+    .on('error', (err) => {
+      logger.error({ err });
+    })
     .on('repairing', () => {
       logger.info({ path: dbConfig.path }, 'Repairing database.');
     });
@@ -90,17 +90,17 @@ LimitdServer.prototype._handler = function (socket) {
   };
 
   socket.on('error', function (err) {
-    logger.debug(_.extend(sockets_details, {
+    logger.info(_.extend(sockets_details, {
       err: {
         code:    err.code,
         message: err.message
       }
     }), 'connection error');
   }).on('close', function () {
-    logger.debug(sockets_details, 'connection closed');
+    logger.info(sockets_details, 'connection closed');
   });
 
-  logger.debug(sockets_details, 'connection accepted');
+  logger.info(sockets_details, 'connection accepted');
 
   const decoder = new RequestDecoder();
 
@@ -122,49 +122,49 @@ LimitdServer.prototype._handler = function (socket) {
   const latencyBuckets = this._latencyBuckets;
 
   socket.pipe(lps.decode())
-        .pipe(decoder)
-        .pipe(request_handler)
-        // This is equivalent to a PassThrough which logs the latency as close
-        // from the moment as close to the decoder and encoder as possible
-        .pipe(new stream.Transform({
-          objectMode: true,
-          transform(result, encoding, callback) {
-            const duration = Date.now() - result.request.startTs;
+    .pipe(decoder)
+    .pipe(request_handler)
+    // This is equivalent to a PassThrough which logs the latency as close
+    // from the moment as close to the decoder and encoder as possible
+    .pipe(new stream.Transform({
+      objectMode: true,
+      transform(result, encoding, callback) {
+        const duration = Date.now() - result.request.startTs;
 
-            agent.metrics.observeBucketed('operation.latency',
-              duration,
-              latencyBuckets,
-              { method: result.request.method });
+        agent.metrics.observeBucketed('operation.latency',
+          duration,
+          latencyBuckets,
+          { method: result.request.method });
 
-            this.push(result);
-            callback();
-          }
-        }))
-        .pipe(encoder)
-        .pipe(lps.encode())
-        .pipe(socket);
+        this.push(result);
+        callback();
+      }
+    }))
+    .pipe(encoder)
+    .pipe(lps.encode())
+    .pipe(socket);
 };
 
 LimitdServer.prototype.start = function (done) {
-  var self = this;
-
   if (!this._db.isOpen()) {
-    return this._db.once('ready', () => this.start(done));
+    return this._db.once('ready', () => {
+      this.start(done);
+    });
   }
 
-  self._server.listen(this._config.port, this._config.hostname, function(err) {
+  this._server.listen(this._config.port, this._config.hostname, (err) => {
     if (err) {
       logger.error(err, 'error starting server');
-      self.emit('error', err);
+      this.emit('error', err);
       if (done) {
         done(err);
       }
       return;
     }
 
-    var address = self._server.address();
+    var address = this._server.address();
     logger.info(address, 'server started');
-    self.emit('started', address);
+    this.emit('started', address);
     if (done) {
       done(null, address);
     }
@@ -174,10 +174,9 @@ LimitdServer.prototype.start = function (done) {
 };
 
 LimitdServer.prototype.stop = function (callback) {
-  var self = this;
-  var address = self._server.address();
+  var address = this._server.address();
   callback = cb(callback || _.noop).timeout(5000).once();
-  logger.debug(address, 'closing server');
+  logger.info(address, 'closing server');
 
   this._server.destroy((serverCloseError) => {
     if (serverCloseError) {
@@ -186,23 +185,24 @@ LimitdServer.prototype.stop = function (callback) {
         address
       }, 'error closing the tcp server');
     } else {
-      logger.debug({ address }, 'server closed');
+      logger.info({ address }, 'server closed');
     }
-    this._db.close(dbCloseError => {
+    this._db.close((dbCloseError) => {
       if (dbCloseError) {
         logger.error({
           err: dbCloseError
         }, 'error closing the database');
       } else {
-        logger.debug('database closed');
+        logger.info('database closed');
       }
-      self.emit('close');
+      this.emit('close');
       return callback(serverCloseError || dbCloseError);
     });
   });
-
 };
 
+LimitdServer.prototype.updateTypes = function (types) {
+  this._db.loadTypes(types);
+};
 
 module.exports = LimitdServer;
-

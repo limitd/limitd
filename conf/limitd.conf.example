@@ -1,8 +1,15 @@
 #port to listen on
-#port: 9231
+port: 9231
 
 #db path
-db: /var/limitd/database
+db:
+  path: /tmp/
+  driver: rocksdb
+
+configurator:
+  type: file
+  path: /tmp/buckets
+  interval: 60000
 
 #define the bucket types
 buckets:

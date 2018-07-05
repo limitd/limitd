@@ -3,7 +3,6 @@ const yaml = require('js-yaml');
 const path = require('path');
 const fs = require('fs');
 
-
 module.exports.parse = function(configFile) {
   const configFilePath = path.resolve(process.cwd(), configFile);
   const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));

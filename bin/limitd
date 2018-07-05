@@ -2,11 +2,38 @@
 
 process.title = 'limitd server';
 
+const _ = require('lodash');
 const config = require('../conf');
+
+const agent = require('../lib/agent');
+const logger = agent.logger;
+const metrics = agent.metrics;
+const Configurator = require('../lib/configurator');
+
 const LimitdServer = require('../server');
 const server = new LimitdServer(config);
 
 server.start();
+
+server.on('started', () => {
+  if (!config.configurator) {
+    return;
+  }
+  const configuratorConfig = _.cloneDeep(config.configurator);
+  configuratorConfig.metrics = metrics;
+  configuratorConfig.logger = logger;
+  configuratorConfig.currentVal = config.buckets;
+  const configurator = new Configurator(configuratorConfig);
+  configurator.checkForChanges();
+  configurator.on('error', (err) => {
+    logger.error('error in configurator', err);
+  });
+  configurator.on('changed', (data) => {
+    const start = Date.now();
+    server.updateBucketConfig(data);
+    logger.info('updated bucket configuration', { took: Date.now() - start });
+  });
+});
 
 function finish () {
   server.stop((err) => {
@@ -16,4 +43,8 @@ function finish () {
 
 process
   .on('SIGTERM', finish)
-  .on('SIGINT', finish);
+  .on('SIGINT', finish)
+  .on('uncaughtException', (err) => {
+    logger.error(err);
+    finish();
+  });
