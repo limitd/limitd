@@ -22,7 +22,11 @@ server.on('started', () => {
     config.configurator.currentVal = config.buckets;
     const configurator = new Configurator(config.configurator);
     configurator.on('changed', (data) => {
-      const buckets = yaml.load(data);
+      try {
+        const buckets = yaml.load(data);
+      } catch(err) {
+        return logger.error('invalid bucket configuration', err);
+      }
       const start = Date.now();
       server.updateBucketConfig(buckets);
       logger.info('updated bucket configuration', { took: Date.now() - start });
