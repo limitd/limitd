@@ -2,7 +2,9 @@
 port: 9231
 
 #db path
-db: /tmp/
+db:
+  path: /tmp/
+  driver: rocksdb
 
 configurator:
   type: file

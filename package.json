@@ -32,6 +32,7 @@
     "limitdb": "^2.7.0",
     "lodash": "^4.17.10",
     "nodecredstash": "^2.0.2",
+    "pino": "^4.17.3",
     "readable-stream": "^2.3.6",
     "reconnect-net": "1.1.1",
     "server-destroy": "^1.0.1",

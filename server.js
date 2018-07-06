@@ -93,7 +93,7 @@ LimitdServer.prototype._handler = function (socket) {
     logger.info(sockets_details, 'connection closed');
   });
 
-  logger.debug(sockets_details, 'connection accepted');
+  logger.info(sockets_details, 'connection accepted');
 
   const decoder = new RequestDecoder();
 
@@ -161,7 +161,7 @@ LimitdServer.prototype.stop = function (callback) {
         address
       }, 'error closing the tcp server');
     } else {
-      logger.debug({ address }, 'server closed');
+      logger.info({ address }, 'server closed');
     }
     this._db.close((dbCloseError) => {
       if (dbCloseError) {
