@@ -89,6 +89,10 @@ module.exports = {
       type: 'string',
       description: 'the url to report errors (e.g. sentry)'
     },
+    node_env: {
+      type: 'string',
+      description: 'node environment (e.g. production or development)'
+    },
     latency_buckets: {
       type: 'array',
       items: {
