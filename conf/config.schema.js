@@ -73,33 +73,6 @@ module.exports = {
     log_file: {
       description: 'log to a file instead of stdout'
     },
-    log_to_kinesis: {
-      type: 'string',
-      description: 'stream name to log to kinesis'
-    },
-    log_to_kinesis_level: {
-      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace'],
-      description: 'the verbosity of the logs to kinesis, keep in mind that this is a rate limiting system. WARN: setting it too verbose may hurt Kibana',
-    },
-    aws_kinesis_region: {
-      type: 'string',
-      description: 'the region for the Kinesis stream to send logs'
-    },
-    error_reporter_url: {
-      type: 'string',
-      description: 'the url to report errors (e.g. sentry)'
-    },
-    node_env: {
-      type: 'string',
-      description: 'node environment (e.g. production or development)'
-    },
-    latency_buckets: {
-      type: 'array',
-      items: {
-        type: 'integer'
-      }
-    },
-
     buckets: {
       type: 'object',
       description: 'The configuration for all bucket types',
