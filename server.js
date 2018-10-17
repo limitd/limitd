@@ -73,6 +73,9 @@ function LimitdServer (options) {
     .on('repairing', () => {
       logger.info({ path: dbConfig.path }, 'Repairing database.');
     });
+
+  // Let's be a little defensive so we avoid orchestration requirement
+  this._latencyBuckets = Array.isArray(this._config.latency_buckets) ? this._config.latency_buckets : [];
 }
 
 util.inherits(LimitdServer, EventEmitter);
@@ -116,7 +119,7 @@ LimitdServer.prototype._handler = function (socket) {
   });
 
   const encoder = new ResponseEncoder();
-  const config = this._config;
+  const latencyBuckets = this._latencyBuckets;
 
   socket.pipe(lps.decode())
         .pipe(decoder)
@@ -130,7 +133,7 @@ LimitdServer.prototype._handler = function (socket) {
 
             agent.metrics.observeBucketed('operation.latency',
               duration,
-              config.latency_buckets,
+              latencyBuckets,
               { method: result.request.method });
 
             this.push(result);
