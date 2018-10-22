@@ -10,6 +10,7 @@ const logger  = agent.logger;
 const RequestHandler  = require('./lib/pipeline/RequestHandler');
 const RequestDecoder  = require('./lib/pipeline/RequestDecoder');
 const ResponseEncoder = require('./lib/pipeline/ResponseEncoder');
+const stream = require('stream');
 
 const lps = require('length-prefixed-stream');
 
@@ -72,6 +73,9 @@ function LimitdServer (options) {
     .on('repairing', () => {
       logger.info({ path: dbConfig.path }, 'Repairing database.');
     });
+
+  // Let's be a little defensive so we avoid orchestration requirement
+  this._latencyBuckets = Array.isArray(this._config.latency_buckets) ? this._config.latency_buckets : [];
 }
 
 util.inherits(LimitdServer, EventEmitter);
@@ -106,7 +110,7 @@ LimitdServer.prototype._handler = function (socket) {
   });
 
   const request_handler = new RequestHandler({
-    db: this._db,
+    db: this._db
   });
 
   request_handler.once('error', (err) => {
@@ -115,10 +119,27 @@ LimitdServer.prototype._handler = function (socket) {
   });
 
   const encoder = new ResponseEncoder();
+  const latencyBuckets = this._latencyBuckets;
 
   socket.pipe(lps.decode())
         .pipe(decoder)
         .pipe(request_handler)
+        // This is equivalent to a PassThrough which logs the latency as close
+        // from the moment as close to the decoder and encoder as possible
+        .pipe(new stream.Transform({
+          objectMode: true,
+          transform(result, encoding, callback) {
+            const duration = Date.now() - result.request.startTs;
+
+            agent.metrics.observeBucketed('operation.latency',
+              duration,
+              latencyBuckets,
+              { method: result.request.method });
+
+            this.push(result);
+            callback();
+          }
+        }))
         .pipe(encoder)
         .pipe(lps.encode())
         .pipe(socket);
