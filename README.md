@@ -79,7 +79,7 @@ limitd --config-file /etc/limitd.config
 
 You can find all configuration options [below](#server_options).
 
-> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
+> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementioned command.
 
 #### Configuration with environment variables
 ```bash
@@ -98,7 +98,7 @@ export BUCKET_2_NAME=some_other_bucket
 export BUCKET_2_SIZE=25
 export BUCKET_2_PER_MINUTE=15
 ```
-> **Note**: Using enviroment variables for buckets has a limitation. The `override` config parameter is not supported yet.
+> **Note**: Using environment variables for buckets has a limitation. The `override` config parameter is not supported yet.
 
 Start the server:
 ```bash
@@ -107,11 +107,11 @@ limitd
 
 You can find all configuration options [below](#server_options).
 
-> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementiond command.
+> **Note**: For production you would create a daemon (upstart, systemd, initd, etc.) that runs the aforementioned command.
 
 ## Motivation
 
-While there are many solutions that relies on a central database like redis, these solutions tipically put all the configuration, limits and logic on the application side.
+While there are many solutions that relies on a central database like redis, these solutions typically put all the configuration, limits and logic on the application side.
 
 ## Core concepts
 
@@ -123,7 +123,7 @@ The core concepts of limitd are:
     -  Created on demand.
     -  Destroyed when not used.
 -  **Request**: a request made by a client to  **take or wait** N tokens from the **bucket instance X** of the **bucket type y**.
--  **Response**: is the response from the server to a client request indicating that the operation was succesful or not.
+-  **Response**: is the response from the server to a client request indicating that the operation was successful or not.
 
 Limitd protocol uses [Protocol Buffers](https://developers.google.com/protocol-buffers) over tcp. The definition of the protocol are in [protocol/messages](https://github.com/limitd/protocol/tree/master/messages).
 
