@@ -30,6 +30,10 @@ buckets:
         until: !!timestamp 2010-11-18
         match: !!js/regexp /^10\./i
 
+  with ttl:
+    size: 3
+    ttl: 500
+
   wrong_password:
     size: 3
     override:

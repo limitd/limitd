@@ -68,6 +68,29 @@ describe('limitd server', function () {
       });
     });
 
+    it('should support ttl', function (done) {
+      async.map(_.range(0, 3), function (i, cb) {
+        client.take('with ttl', 'tito', cb);
+      }, function (err, results) {
+        if (err) return done(err);
+        assert.ok(results.every(function (r) {
+          return r.conformant;
+        }));
+        client.take('with ttl', 'tito', function (err, response) {
+          assert.ifError(err);
+          assert.notOk(response.conformant);
+
+          setTimeout(() => {
+            client.take('with ttl', 'tito', function (err, response) {
+              assert.ifError(err);
+              assert.ok(response.conformant);
+              done();
+            });
+          }, 1000);
+        });
+      });
+    });
+
     it('should work with an override on a fixed bucket', function (done) {
       async.map(_.range(2), function (i, cb) {
         client.take('wrong_password', 'dudu', cb);

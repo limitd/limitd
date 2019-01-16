@@ -22,6 +22,12 @@ var perHourSchema = {
   minimum: 1
 };
 
+var ttlSchema = {
+  type: 'integer',
+  description: 'Amount of ms. the key will be kept',
+  minimum: 1
+};
+
 var matchSchema = {
   type: ['string', 'object'],
   description: 'Regexp to match against the key'
@@ -118,6 +124,7 @@ module.exports = {
             per_second: perSecondSchema,
             per_minute: perMinuteSchema,
             per_hour: perHourSchema,
+            ttl: ttlSchema,
             match: matchSchema,
             unlimited: unlimitedSchema,
             override: {
@@ -134,6 +141,7 @@ module.exports = {
                     per_second: perSecondSchema,
                     per_minute: perMinuteSchema,
                     per_hour: perHourSchema,
+                    ttl: ttlSchema,
                     match: matchSchema,
                     unlimited: unlimitedSchema,
                     until: {
