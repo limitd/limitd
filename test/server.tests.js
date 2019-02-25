@@ -180,6 +180,21 @@ describe('limitd server', function () {
 
   });
 
+  describe('GET', function () {
+    it('should work with a simple request', function (done) {
+      var now = 1425920267;
+      MockDate.set(now * 1000);
+
+      client.get('ip', '211.123.12.12', function (err, response) {
+        if (err) return done(err);
+        assert.equal(response.remaining, 10);
+        assert.equal(response.reset, now);
+        assert.equal(response.limit, 10);
+        done();
+      });
+    });
+  });
+
   describe('WAIT', function () {
     it('should work with a simple request', function (done) {
       var now = 1425920267;
