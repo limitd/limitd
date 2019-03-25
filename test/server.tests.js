@@ -185,7 +185,7 @@ describe('limitd server', function () {
       var now = 1425920267;
       MockDate.set(now * 1000);
 
-      client.get('ip', '211.123.12.12', function (err, response) {
+      client.get('ip', '211.123.2.213', function (err, response) {
         if (err) return done(err);
         assert.equal(response.remaining, 10);
         assert.equal(response.reset, now);
@@ -251,11 +251,11 @@ describe('limitd server', function () {
 
   describe('PUT', function () {
     it('should restore the bucket when reseting', function (done) {
-      client.take('ip', '211.123.12.12', function (err) {
+      client.take('ip', '211.123.12.123', function (err) {
         if (err) return done(err);
-        client.put('ip', '211.123.12.12', function (err) {
+        client.put('ip', '211.123.12.123', function (err) {
           if (err) return done(err);
-          client.take('ip', '211.123.12.12', function (err, response) {
+          client.take('ip', '211.123.12.123', function (err, response) {
             if (err) return done(err);
             assert.equal(response.remaining, 9);
             done();
