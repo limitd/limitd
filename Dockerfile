@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:8.16
 
 RUN apt-get update && apt-get install -y apt-transport-https && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
