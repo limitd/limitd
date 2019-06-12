@@ -1,6 +1,6 @@
 {
   "name": "limitd",
-  "version": "6.0.0",
+  "version": "5.11.0",
   "description": "Daemon for rate limiting using tocket buckets.",
   "main": "index.js",
   "repository": {
@@ -35,7 +35,7 @@
     "reconnect-net": "1.1.1",
     "server-destroy": "^1.0.1",
     "typedarray-to-buffer": "^3.1.5",
-    "v8-profiler-node8": "^6.0.1",
+    "v8-profiler-node8": "^5.7.8",
     "z-schema": "^3.19.1",
     "z-schema-errors": "^0.2.1"
   },
