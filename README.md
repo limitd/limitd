@@ -7,7 +7,7 @@ In order to use **limitd** you need to setup the server and consume it from the 
 
 This example assumes that you want to implement rate limiting for an express application.
 
-**For Node v6.x.x, use releases in the v5.x.x stream. For Node v8.x.x / v10.x.x use releases in the v6.x.x stream.**
+**Support for Node v8.x.x / v10.x.x has been added as of the v6.0.0 release.**
 
 ### node.js client
 To instantiate the **limitd** client:
