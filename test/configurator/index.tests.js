@@ -46,8 +46,7 @@ describe('Configurator', function() {
           }
         }, currentVal: 'test',
         logger: {
-          info: (msg) => {
-            assert.equal(msg, 'Configurator: fetching config');
+          info: () => {
           }
         },
         metrics: {

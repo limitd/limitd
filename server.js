@@ -201,7 +201,7 @@ LimitdServer.prototype.stop = function (callback) {
   });
 };
 
-LimitdServer.prototype.updateTypes = function (types) {
+LimitdServer.prototype.updateBucketConfig = function (types) {
   this._db.loadTypes(types);
 };
 
