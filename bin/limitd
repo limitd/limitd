@@ -45,6 +45,6 @@ process
   .on('SIGTERM', finish)
   .on('SIGINT', finish)
   .on('uncaughtException', (err) => {
-    logger.error(err);
-    finish();
+    logger.error('uncaughtException', err);
+    finish(err);
   });

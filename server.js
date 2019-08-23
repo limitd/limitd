@@ -68,7 +68,7 @@ function LimitdServer (options) {
       logger.info({ path: dbConfig.path }, 'Database ready.');
     })
     .on('error', (err) => {
-      logger.error({ err });
+      logger.error({ err }, 'Error in database.');
     })
     .on('repairing', () => {
       logger.info({ path: dbConfig.path }, 'Repairing database.');
