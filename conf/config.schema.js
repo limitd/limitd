@@ -99,7 +99,15 @@ module.exports = {
         type: 'integer'
       }
     },
-
+    collect_resource_usage: {
+      type: 'boolean',
+      default: false,
+      description: 'Collect CPU, eventloop and memory usage'
+    },
+    configurator: {
+      type: 'object',
+      description: 'dynamic configuration'
+    },
     buckets: {
       type: 'object',
       description: 'The configuration for all bucket types',

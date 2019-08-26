@@ -1,5 +1,5 @@
-const program  = require('commander');
 const _ = require('lodash');
+const program  = require('commander');
 const configEnvParser = require('../conf/parser/env');
 const configFileParser = require('../conf/parser/file');
 

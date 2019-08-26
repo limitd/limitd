@@ -8,9 +8,8 @@
     "url": "http://github.com/auth0/limitd.git"
   },
   "scripts": {
-    "lint": "jshint --exclude ./node_modules .",
-    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --exit",
-    "perf": "node perf/index.js"
+    "test": "NODE_ENV=test CONFIG_FILE=./test/fixture.yml mocha --timeout 5000 --recursive --exit",
+    "lint": "eslint ."
   },
   "bin": {
     "limitd": "./bin/limitd"
@@ -21,34 +20,33 @@
     "node": ">=6"
   },
   "dependencies": {
-    "async": "^2.6.0",
-    "auth0-common-logging": "auth0/auth0-common-logging#v2.18.0",
+    "async": "^2.6.1",
+    "auth0-common-logging": "github:auth0/auth0-common-logging#v2.18.0",
     "auth0-instrumentation": "github:auth0/auth0-instrumentation#v2.27.3",
     "cb": "^0.1.0",
-    "commander": "~2.15.0",
-    "js-yaml": "~3.11.0",
-    "length-prefixed-stream": "~1.5.1",
-    "limitd-protocol": "limitd/protocol#v2.1.0",
+    "commander": "^2.15.1",
+    "js-yaml": "^3.13.1",
+    "length-prefixed-stream": "^1.5.2",
+    "limitd-protocol": "github:limitd/protocol#v2.1.0",
     "limitdb": "^3.0.0",
-    "lodash": "~4.17.5",
-    "readable-stream": "^2.3.5",
+    "lodash": "^4.17.15",
+    "readable-stream": "^2.3.6",
     "reconnect-net": "1.1.1",
     "server-destroy": "^1.0.1",
-    "typedarray-to-buffer": "^3.1.5",
-    "v8-profiler-node8": "^6.0.1",
-    "z-schema": "^3.19.1",
+    "z-schema": "^3.22.0",
     "z-schema-errors": "^0.2.1"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
     "chai": "~4.1.2",
     "cli-table": "~0.3.1",
+    "eslint": "^6.2.1",
     "fast-stats": "0.0.3",
-    "jshint": "^2.9.5",
     "limitd-client": "^2.14.0",
-    "mocha": "~5.0.4",
+    "mocha": "^6.2.0",
     "mockdate": "~2.0.2",
     "progress": "~2.0.0",
-    "rimraf": "~2.6.2"
+    "rimraf": "~2.6.2",
+    "sinon": "^6.0.1"
   }
 }
