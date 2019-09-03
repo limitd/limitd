@@ -19,7 +19,7 @@ describe('FileStore', function() {
       });
     });
     it('should callback with value', function(done) {
-      const c = new FileStore({ path: `${__dirname}/../fixture/fixture.yml` });
+      const c = new FileStore({ path: `${__dirname}/../fixture/fixture-configurator.yml` });
       c.fetch((err, data) => {
         assert.isNull(err);
         done();

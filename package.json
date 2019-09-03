@@ -1,6 +1,6 @@
 {
   "name": "limitd",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Daemon for rate limiting using tocket buckets.",
   "main": "index.js",
   "repository": {
