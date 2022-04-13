@@ -20,7 +20,7 @@
     "node": ">=6"
   },
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.2",
     "auth0-common-logging": "github:auth0/auth0-common-logging#v2.18.0",
     "auth0-instrumentation": "github:auth0/auth0-instrumentation#v2.27.3",
     "cb": "^0.1.0",
