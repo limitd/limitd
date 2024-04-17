@@ -5,9 +5,6 @@ process.title = 'limitd server';
 const _ = require('lodash');
 const config = require('../conf');
 
-const agent = require('../lib/agent');
-const logger = agent.logger;
-const metrics = agent.metrics;
 const Configurator = require('../lib/configurator');
 
 const LimitdServer = require('../server');
@@ -20,7 +17,6 @@ server.on('started', () => {
     return;
   }
   const configuratorConfig = _.cloneDeep(config.configurator);
-  configuratorConfig.metrics = metrics;
   configuratorConfig.logger = logger;
   configuratorConfig.currentVal = config.buckets;
   const configurator = new Configurator(configuratorConfig);

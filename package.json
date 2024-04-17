@@ -1,6 +1,6 @@
 {
   "name": "limitd",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "description": "Daemon for rate limiting using tocket buckets.",
   "main": "index.js",
   "repository": {
@@ -21,8 +21,7 @@
   },
   "dependencies": {
     "async": "^2.6.1",
-    "auth0-common-logging": "github:auth0/auth0-common-logging#v2.18.0",
-    "auth0-instrumentation": "github:auth0/auth0-instrumentation#v2.27.3",
+    "bunyan": "^1.8.1",
     "cb": "^0.1.0",
     "commander": "^2.15.1",
     "js-yaml": "^3.13.1",
