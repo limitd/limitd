@@ -129,13 +129,6 @@ LimitdServer.prototype._handler = function (socket) {
     .pipe(new stream.Transform({
       objectMode: true,
       transform(result, encoding, callback) {
-        const duration = Date.now() - result.request.startTs;
-
-        agent.metrics.observeBucketed('operation.latency',
-          duration,
-          latencyBuckets,
-          { method: result.request.method });
-
         this.push(result);
         callback();
       }

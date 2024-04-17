@@ -49,12 +49,6 @@ describe('Configurator', function() {
           info: () => {
           }
         },
-        metrics: {
-          histogram: (key, val) => {
-            assert.equal(key, 'configurator.fetch');
-            assert.isNumber(val);
-          }
-        }
       });
       c.once('changed', (hash) => {
         assert.exists(hash);
